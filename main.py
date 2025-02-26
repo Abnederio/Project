@@ -80,7 +80,7 @@ flavor_notes = st.selectbox(
 )
 
 bitterness_level = st.selectbox(
-    'How would you like your bitterness Level?',
+    'How would you like the bitterness Level?',
     ('Low', 'Medium', 'High')
 )
 
