@@ -43,9 +43,7 @@ st.write(f"**Model Accuracy:** {accuracy:.2f}%")
 
 st.header(" Prediction")
 
-   # Input boxes for the features
-
-df["Caffeine Level"].unique()
+# Input boxes for the features
 
 caffeine_level = st.selectbox(
     'How would you like your Caffeine Level?',
