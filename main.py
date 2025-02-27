@@ -12,7 +12,7 @@ import numpy as np
 df = pd.read_csv("Balanced_CoffeeDS_500.csv")
 
 df = df.drop(columns=['Acidity Level']) #might be dropped
-df = df.drop(columns=['Temperature'])
+df = df.drop(columns=['Type'])
 
 df.head()
 
@@ -46,17 +46,17 @@ st.header(" Prediction")
 # Input boxes for the features
 
 caffeine_level = st.selectbox(
-    'How would you like your Caffeine Level?',
+    'How would you like the Caffeine Level?',
     ('Low', 'Medium', 'High')
 )
 
 sweetness = st.selectbox(
-    'How would you like your Sweetness?',
+    'How would you like the Sweetness?',
     ('Low', 'Medium', 'High')
 )
 
-drink_type = st.selectbox(
-    'How would you like the Type?',
+temperature = st.selectbox(
+    'How would you like the drink type?',
     ('Frozen', 'Hot', 'Iced')
 )
 
@@ -89,18 +89,18 @@ weather = st.selectbox(
 
 classes_list = [
     'Cappuccino', 'Double Double', 'Dark Roast', 'Cafe Americano', 
-    'French Vanilla', 'Macchiato', 'Latte', 'Handcrafted milk chocolate', 
-    'Cafe Mocha', 'Classic Roast', 'Iced Capp', 'Freshly Brewed Iced Tea', 
-    'Frozen Hot Chocolate', 'Triple Coffee Jelly', 'Iced Capp Supreme', 
+    'French Vanilla', 'Macchiato', 'Latte', 'Handcrafted Milk Chocolate', 
+    'Café Mocha', 'Classic Roast', 'Iced Cappuccino', 'Freshly Brewed Iced Tea', 
+    'Frozen Hot Chocolate', 'Triple Coffee Jelly', 'Iced Cappuccino Supreme', 
     'Iced Coffee', 'Iced French Vanilla', 'French Vanilla Cold Brew', 
-    'Spanish Latte', 'Iced Citrus Black Tea', 'Iced Latte', 
+    'Spanish Latte ', 'Iced Latte', 
     'Iced Handcrafted Milk Chocolate'
 ]
         
         # Button to detect
 if st.button('Recommend', key='rfr_detect'):
     # Prepare the input data for prediction
-    rfr_input_data = [[caffeine_level, sweetness, drink_type, roast_level, milk_type, flavor_notes, bitterness_level, weather]]
+    rfr_input_data = [[caffeine_level, sweetness, roast_level, milk_type, flavor_notes, bitterness_level, weather, temperature]]
     
     # Predict the recommended coffee
     rfr_prediction = model.predict(rfr_input_data)
