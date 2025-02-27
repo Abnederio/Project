@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 import streamlit as st
 import joblib
 import os
-
+import numpy as np
 
 df = pd.read_csv("Balanced_CoffeeDS_500.csv")
 
@@ -97,13 +97,29 @@ classes_list = [
     'Iced Handcrafted Milk Chocolate'
 ]
         
-        # Button to detect the Iris species
+        # Button to detect
 if st.button('Recommend', key='rfr_detect'):
-            # Prepare the input data for prediction
+    # Prepare the input data for prediction
     rfr_input_data = [[caffeine_level, sweetness, drink_type, roast_level, milk_type, flavor_notes, bitterness_level, weather]]
-            
-            # Predict the Iris species
+    
+    # Predict the recommended coffee
     rfr_prediction = model.predict(rfr_input_data)
-            
-            # Display the prediction result
-    st.markdown(f'The coffee we recommend is: `{rfr_prediction[0]}`')
+
+    # Extract the prediction properly
+    recommended_coffee = rfr_prediction[0]  # First element
+
+    # Ensure it's a plain string (handles NumPy array cases)
+    if isinstance(recommended_coffee, (list, np.ndarray)):  
+        recommended_coffee = recommended_coffee[0]  # Extract string if it's in a list/array
+
+    recommended_coffee = str(recommended_coffee)  # Convert to string
+    
+    # Display the recommendation
+    st.markdown(f'The coffee we recommend is: `{recommended_coffee}`')
+
+    # Construct the image path
+    image_path = f"images/{recommended_coffee}.png"
+
+    # Display the image
+    st.image(image_path, caption=f"Recommended Coffee: {recommended_coffee}", use_column_width=True)
+
