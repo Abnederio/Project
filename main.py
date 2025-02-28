@@ -22,13 +22,6 @@ if st.sidebar.button("🔑 Admin Login"):
     st.query_params["page"] = "admin"
     st.rerun()
 
-# Get current query parameters
-query_params = st.query_params
-
-# Check if the page is "admin"
-if query_params.get("page") == "admin":
-    import admin  # Load `admin.py`
-
 # Load dataset
 df = pd.read_csv("coffee_dataset.csv")
 
