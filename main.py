@@ -9,10 +9,9 @@ import joblib
 import os
 import numpy as np
 
-df = pd.read_csv("Balanced_CoffeeDS_500.csv")
 
-df = df.drop(columns=['Acidity Level']) #might be dropped
-df = df.drop(columns=['Type'])
+
+df = pd.read_csv("coffee_dataset.csv")
 
 df.head()
 
@@ -55,9 +54,9 @@ sweetness = st.selectbox(
     ('Low', 'Medium', 'High')
 )
 
-temperature = st.selectbox(
+drink_type = st.selectbox(
     'How would you like the drink type?',
-    ('Frozen', 'Hot', 'Iced')
+    ('Frozen', 'Iced', 'Hot')
 )
 
 roast_level = st.selectbox(
@@ -73,8 +72,8 @@ else:
     
 flavor_notes = st.selectbox(
     'How would you like the Flavor?',
-    ('Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy',
-     'Caramel', 'Espresso')
+    ('Creamy', 'Earthy', 'Vanilla', 'Sweet', 'Bold', 'Bitter', 'Smooth', 'Nutty'
+ 'Chocolate', 'Caramel', 'Espresso')
 )
 
 bitterness_level = st.selectbox(
@@ -82,25 +81,23 @@ bitterness_level = st.selectbox(
     ('Low', 'Medium', 'High')
 )
 
-weather = st.selectbox(
-    'How do you feel the ambiance today?',
-    ('Hot', 'Cold')
-)
-
 classes_list = [
-    'Cappuccino', 'Double Double', 'Dark Roast', 'Cafe Americano', 
-    'French Vanilla', 'Macchiato', 'Latte', 'Handcrafted Milk Chocolate', 
-    'Café Mocha', 'Classic Roast', 'Iced Cappuccino', 'Freshly Brewed Iced Tea', 
-    'Frozen Hot Chocolate', 'Triple Coffee Jelly', 'Iced Cappuccino Supreme', 
-    'Iced Coffee', 'Iced French Vanilla', 'French Vanilla Cold Brew', 
-    'Spanish Latte ', 'Iced Latte', 
+    'Handcrafted Milk Chocolate', 'Mocha Latte', 'French Vanilla',
+    'Freshly Brewed Iced Tea', 'Irish Coffee', 'Flat White', 'Café Mocha',
+    'Dead Eye', 'Iced Cappuccino', 'Spanish Latte', 'Caramel Macchiato',
+    'Triple Coffee Jelly', 'Cafe Americano', 'French Vanilla Cold Brew',
+    'Cortado', 'Vienna Coffee', 'Latte', 'Turkish Coffee', 'Affogato',
+    'Iced Cappuccino Supreme', 'Iced Coffee', 'Iced French Vanilla', 'Ristretto',
+    'Dark Roast', 'Classic Roast', 'Espresso', 'Double Double', 'Doppio',
+    'Iced Latte', 'Macchiato', 'Cold Brew', 'Nitro Cold Brew',
+    'Frozen Hot Chocolate', 'Cappuccino', 'Black Eye', 'Red Eye',
     'Iced Handcrafted Milk Chocolate'
 ]
         
         # Button to detect
 if st.button('Recommend', key='rfr_detect'):
     # Prepare the input data for prediction
-    rfr_input_data = [[caffeine_level, sweetness, roast_level, milk_type, flavor_notes, bitterness_level, weather, temperature]]
+    rfr_input_data = [[caffeine_level, sweetness, drink_type, roast_level, milk_type, flavor_notes, bitterness_level]]
     
     # Predict the recommended coffee
     rfr_prediction = model.predict(rfr_input_data)
@@ -122,4 +119,6 @@ if st.button('Recommend', key='rfr_detect'):
 
     # Display the image
     st.image(image_path, caption=f"Recommended Coffee: {recommended_coffee}", use_column_width=True)
+    
+
 
