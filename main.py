@@ -9,8 +9,22 @@ import joblib
 import os
 import numpy as np
 
-df = pd.read_csv("coffee_dataset.csv")
+#Admin Button
+if st.sidebar.button("🔑 Admin Login"):
+    st.query_params["page"] = "admin"  # Navigate to admin page
+    st.rerun()  # Refresh to apply changes
 
+# Get current query parameters
+query_params = st.query_params  # Get current parameters
+
+# Check if the page is "admin" (load admin panel)
+if query_params.get("page") == "admin":
+    import admin  # Load `admin.py`
+    
+
+
+    
+df = pd.read_csv("coffee_dataset.csv")
 df.head()
 
 X = df.drop(columns=['Coffee Name'])
@@ -38,7 +52,7 @@ else:
 
 st.write(f"**Model Accuracy:** {accuracy:.2f}%")
 
-st.header(" Alex Coffee Haven")
+st.header(" Alex's Coffee Haven Coffee Recommender ☕")
 
 # Input boxes for the features
 
