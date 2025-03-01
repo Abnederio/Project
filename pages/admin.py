@@ -4,6 +4,9 @@ import requests
 # Flask Backend URL
 API_BASE_URL = "http://127.0.0.1:5000"
 
+if st.button("🏠 Go Back to Home"):
+    st.switch_page("main.py")
+
 # Function to handle login
 def login(username, password):
     response = requests.post(f"{API_BASE_URL}/login", json={"username": username, "password": password})
@@ -60,9 +63,9 @@ if not st.session_state.token:
         if submitted:
             token = login(username, password)
             if token:
-                st.session_state.token = token
+                st.session_state.token = token   
                 st.success("Login successful!")
-                st.rerun()
+                st.switch_page("pages/menu.py")
 
             else:
                 st.error("Invalid username or password")

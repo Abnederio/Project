@@ -18,9 +18,9 @@ def get_explanation(recommended_coffee, features):
     return response.text  # Extract explanation text
 
 # Admin Button
-if st.sidebar.button("🔑 Admin Login"):
-    st.query_params["page"] = "admin"
-    st.rerun()
+st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender")
+if st.button("🔑 Admin Login"):
+    st.switch_page("pages/admin.py") 
 
 # Load dataset
 df = pd.read_csv("coffee_dataset.csv")
