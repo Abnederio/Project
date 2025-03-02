@@ -113,3 +113,74 @@ with st.form("add_coffee"):
 
             st.rerun()
 
+# ✏️ Update Existing Coffee
+st.write("### ✏️ Update Coffee")
+coffee_names = df["Coffee Name"].dropna().unique()  # Remove NaN values
+selected_coffee = st.selectbox("Select coffee to update:", coffee_names)
+
+if selected_coffee:
+    coffee_data = df[df["Coffee Name"] == selected_coffee].iloc[0]
+
+    # Function to handle NaN values safely
+    def get_valid_index(value, options):
+        if pd.isna(value) or value not in options:  # Check if NaN or invalid
+            return 0  # Default to the first valid option
+        return options.index(value)
+
+    # Fixing the issue for all fields
+    new_caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'], 
+                                      index=get_valid_index(coffee_data["Caffeine Level"], ['Low', 'Medium', 'High']))
+    new_sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'], 
+                                 index=get_valid_index(coffee_data["Sweetness"], ['Low', 'Medium', 'High']))
+    new_drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'], 
+                                  index=get_valid_index(coffee_data["Type"], ['Frozen', 'Iced', 'Hot']))
+    new_roast_level = st.selectbox('Roast Level:', ['Medium', 'None', 'Dark'], 
+                                   index=get_valid_index(coffee_data["Roast Level"], ['Medium', 'None', 'Dark']))
+    new_milk_type = st.selectbox('Milk Type:', ['Dairy', 'No Dairy'], 
+                                 index=get_valid_index(coffee_data["Milk Type"], ['Dairy', 'No Dairy']))
+    new_flavor_notes = st.selectbox('Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'], 
+                                    index=get_valid_index(coffee_data["Flavor Notes"], ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso']))
+    new_bitterness_level = st.selectbox('Bitterness Level:', ['Low', 'Medium', 'High'], 
+                                        index=get_valid_index(coffee_data["Bitterness Level"], ['Low', 'Medium', 'High']))
+    new_weather = st.selectbox('Weather:', ['Hot', 'Cold'], 
+                               index=get_valid_index(coffee_data["Weather"], ['Hot', 'Cold']))
+
+    if st.button("Update Coffee"):
+        df.loc[df["Coffee Name"] == selected_coffee, ["Caffeine Level", "Sweetness", "Type", "Roast Level", "Milk Type", "Flavor Notes", "Bitterness Level", "Weather"]] = [
+            new_caffeine_level, new_sweetness, new_drink_type, new_roast_level, new_milk_type, new_flavor_notes, new_bitterness_level, new_weather]
+
+        df.to_csv(DATASET_PATH, index=False, na_rep="None")
+        st.success(f"✅ {selected_coffee} updated successfully!")
+        train_and_update_model()
+        st.rerun()
+
+# 🗑 Delete Coffee
+st.write("### 🗑 Delete Coffee")
+
+# Remove NaN coffee names before displaying
+valid_coffee_names = df["Coffee Name"].dropna().unique()
+delete_coffee = st.selectbox("Select coffee to delete:", valid_coffee_names)
+
+if st.button("Delete Coffee"):
+    if delete_coffee in df["Coffee Name"].values:
+        # Remove the selected coffee from dataset
+        df = df[df["Coffee Name"] != delete_coffee]
+
+        # Delete associated image
+        image_path = os.path.join(IMAGE_FOLDER, f"{delete_coffee.replace(' ', '_')}.png")
+        if os.path.exists(image_path):
+            os.remove(image_path)  # ✅ Delete the image file
+            st.success("🖼 Image deleted successfully!")
+
+        # Save updated dataset
+        df.to_csv(DATASET_PATH, index=False, na_rep="None")
+
+        st.success(f"🗑 {delete_coffee} deleted successfully!")
+        
+        # Retrain model after deletion
+        train_and_update_model()
+        
+        st.rerun()
+    else:
+        st.warning("⚠️ Selected coffee does not exist in the dataset.")
+
