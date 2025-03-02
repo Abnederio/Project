@@ -32,7 +32,7 @@ X.fillna("Unknown", inplace=True)
 y.fillna("Unknown", inplace=True)
 
 cat_features = list(range(X.shape[1]))  # Ensure correct categorical indices
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
 MODEL_PATH = "catboost_model.pkl"
 ACCURACY_PATH = "catboost_accuracy.pkl"
@@ -41,7 +41,7 @@ if os.path.exists(MODEL_PATH) and os.path.exists(ACCURACY_PATH):
     model = joblib.load(MODEL_PATH)
     accuracy = joblib.load(ACCURACY_PATH)
 else:
-    model = CatBoostClassifier(iterations=100, learning_rate=0.2, depth=9, verbose=0)
+    model = CatBoostClassifier(iterations=150, learning_rate=0.3, depth=6, task_type="GPU", verbose=0)
     model.fit(X_train, y_train, cat_features=cat_features)
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
@@ -57,7 +57,7 @@ caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'])
 sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'])
 drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'])
 roast_level = st.selectbox('Roast Level:', ['Medium', 'None', 'Dark'])
-milk_type = 'Dairy' if st.toggle("Do you want milk?") else 'None'
+milk_type = 'Dairy' if st.toggle("Do you want milk?") else 'No Dairy'
 flavor_notes = st.selectbox('Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'])
 bitterness_level = st.selectbox('Bitterness Level:', ['Low', 'Medium', 'High'])
 weather = st.selectbox('Weather:', ['Hot', 'Cold'])

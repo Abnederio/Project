@@ -16,7 +16,7 @@ DATASET_PATH = "coffee_dataset.csv"
 os.makedirs(IMAGE_FOLDER, exist_ok=True)
 
 # 📥 Load dataset
-df = pd.read_csv(DATASET_PATH, na_values=["None"])  # ✅ Ensure "None" is read properly
+df = pd.read_csv(DATASET_PATH, na_values=["None"])  # Ensure "None" is read properly
 
 st.title("🥤 Manage Drinks")
 
@@ -29,7 +29,7 @@ def train_and_update_model():
     st.info("🔄 Retraining the model...")
 
     # Load dataset
-    df = pd.read_csv(DATASET_PATH, na_values=["None"])  # ✅ Read "None" properly
+    df = pd.read_csv(DATASET_PATH, na_values=["None"])  
 
     # Drop any unnamed columns (e.g., "Unnamed: 9")
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
@@ -39,14 +39,14 @@ def train_and_update_model():
                 "Flavor Notes", "Bitterness Level", "Weather"]
     target = "Coffee Name"
 
-    # ✅ Keep `None` values instead of replacing them
-    df[features] = df[features].apply(lambda col: col.where(pd.notna(col), None))
+    # ✅ Replace NaN values with "Unknown" (Same as main.py)
+    df[features] = df[features].fillna("Unknown")  
 
     # Split dataset
-    X_train, X_test, y_train, y_test = train_test_split(df[features], df[target], test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(df[features], df[target], test_size=0.3, random_state=42)
 
     # Train new model
-    model = CatBoostClassifier(iterations=100, learning_rate=0.2, depth=9, verbose=0)
+    model = CatBoostClassifier(iterations=150, learning_rate=0.3, depth=6, task_type="GPU", verbose=0)
     model.fit(X_train, y_train, cat_features=features)
 
     # Evaluate accuracy
@@ -67,7 +67,7 @@ with st.form("add_coffee"):
     sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'])
     drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'])
     roast_level = st.selectbox('Roast Level:', ['Medium', 'None', 'Dark'])
-    milk_type = 'Dairy' if st.toggle("Do you want milk?") else None  # ✅ Keep `None` properly
+    milk_type = 'Dairy' if st.toggle("Do you want milk?") else 'No Dairy'
     flavor_notes = st.selectbox('Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'])
     bitterness_level = st.selectbox('Bitterness Level:', ['Low', 'Medium', 'High'])
     weather = st.selectbox('Weather:', ['Hot', 'Cold'])
@@ -88,7 +88,7 @@ with st.form("add_coffee"):
                     f.write(image_file.getbuffer())
                 st.success("📸 Image uploaded successfully!")
 
-            # Add new entry to the dataset (without storing image path)
+            # Add new entry to the dataset
             new_entry = pd.DataFrame([{
                 "Coffee Name": name,
                 "Caffeine Level": caffeine_level,
@@ -101,9 +101,9 @@ with st.form("add_coffee"):
                 "Weather": weather,
             }])
 
-            df = pd.concat([df, new_entry], ignore_index=True)
+            df = pd.concat([new_entry, df], ignore_index=True)
 
-            # ✅ Save with `None` explicitly stored
+            # ✅ Save with "None" explicitly stored
             df.to_csv(DATASET_PATH, index=False, na_rep="None")  
 
             st.success(f"☕ {name} added successfully!")
@@ -112,3 +112,4 @@ with st.form("add_coffee"):
             train_and_update_model()
 
             st.rerun()
+

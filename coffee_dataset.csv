@@ -1,4 +1,7 @@
 Coffee Name,Caffeine Level,Sweetness,Type,Roast Level,Milk Type,Flavor Notes,Bitterness Level,Weather
+Dunkin,High,High,Iced,Dark,Dairy,Vanilla,Low,Hot
+Mcfloat,Medium,High,Frozen,None,No Dairy,Chocolate,Low,Hot
+Dunkin,High,High,Iced,Dark,Dairy,Vanilla,Low,Hot
 Iced French Vanilla,Low,High,Iced,Medium,Dairy,Vanilla,Medium,Hot
 Latte,Low,Low,Hot,Medium,None,Coffee,High,Hot
 Latte,Low,Low,Hot,Medium,None,Coffee,High,Hot
@@ -10547,15 +10550,18 @@ Spanish Latte ,Medium,Low,Iced,Medium,None,Bitter,Low,Hot
 Dark Roast,High,Medium,Iced,Dark,No Dairy,Bitter,Medium,Hot
 Iced Latte,Medium,Medium,Iced,Dark,Dairy,Creamy,Medium,Cold
 Spanish Latte ,Medium,Low,Iced,None,None,Coffee,Medium,Hot
+Mcfloat,Medium,High,Frozen,None,No Dairy,Chocolate,Low,Hot
 Iced Handcrafted Milk Chocolate,High,Medium,Iced,Medium,None,Earthy,Low,Hot
 Iced Handcrafted Milk Chocolate,Medium,Medium,Iced,Medium,None,Caramel,High,Hot
 Iced Handcrafted Milk Chocolate,Low,Medium,Iced,None,Dairy,Chocolate,Low,Hot
+Mcfloat,Medium,High,Frozen,None,No Dairy,Chocolate,Low,Hot
 Triple Coffee Jelly,Medium,Medium,Iced,Medium,Dairy,Caramel,Low,Cold
 Dark Roast,High,Medium,Iced,Dark,No Dairy,Bitter,Medium,Hot
 Iced Cappuccino,Medium,High,Iced,Dark,Dairy,Creamy,Low,Hot
 Iced Coffee,High,Low,Iced,Medium,None,Nutty,Medium,Cold
 Iced Cappuccino,High,High,Iced,None,None,Nutty,Low,Hot
 French Vanilla,High,Medium,Hot,Medium,Dairy,Chocolate,High,Cold
+Mcfloat,Medium,High,Frozen,None,No Dairy,Chocolate,Low,Hot
 Iced Cappuccino,High,High,Iced,None,None,Nutty,Low,Hot
 Handcrafted Milk Chocolate,Low,Low,Hot,Medium,Dairy,Vanilla,Low,Hot
 Latte,Low,Low,Hot,Medium,None,Coffee,High,Hot
@@ -10575,11 +10581,13 @@ Triple Coffee Jelly,Medium,Medium,Iced,Medium,None,Espresso,High,Cold
 Iced Coffee,Low,Medium,Iced,Dark,Dairy,Vanilla,Low,Cold
 Latte,Low,Low,Hot,Medium,None,Coffee,High,Hot
 Iced Cappuccino Supreme,Low,Low,Hot,Dark,Dairy,Coffee,Low,Cold
+Mcfloat,Medium,High,Frozen,None,No Dairy,Chocolate,Low,Hot
 Latte,Low,Low,Hot,Medium,None,Coffee,High,Hot
 Frozen Hot Chocolate,Low,High,Frozen,None,Dairy,Chocolate,Low,Hot
 French Vanilla,Medium,Low,Hot,Medium,Dairy,Creamy,Low,Cold
 Classic Roast,Medium,High,Hot,Dark,No Dairy,Coffee,Medium,Cold
 Iced French Vanilla,High,Low,Iced,None,Dairy,Bitter,Medium,Hot
+Mcfloat,Medium,High,Frozen,None,No Dairy,Chocolate,Low,Hot
 Macchiato,Medium,High,Hot,Medium,Dairy,Caramel,Low,Hot
 Iced French Vanilla,High,Low,Iced,None,Dairy,Bitter,Medium,Hot
 French Vanilla,High,Medium,Hot,Medium,Dairy,Chocolate,High,Cold
@@ -10631,3 +10639,5 @@ Classic Roast,Medium,High,Hot,Dark,No Dairy,Coffee,Medium,Cold
 Iced French Vanilla,High,Low,Iced,None,Dairy,Bitter,Medium,Hot
 Latte,Low,Low,Hot,Medium,None,Coffee,High,Hot
 Triple Coffee Jelly,High,Low,Iced,Medium,None,Nutty,Low,Hot
+Mcfloat,Medium,High,Frozen,None,No Dairy,Chocolate,Low,Hot
+Dunkin,High,High,Iced,Dark,Dairy,Vanilla,Low,Hot
