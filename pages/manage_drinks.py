@@ -6,6 +6,20 @@ from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
+# ✅ Set layout to wide
+st.set_page_config(layout="wide")
+
+# ✅ Apply custom CSS for a wider main content area
+st.markdown("""
+    <style>
+        .main {
+            max-width: 95%;
+            padding-left: 5%;
+            padding-right: 5%;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # 📌 Paths
 MODEL_PATH = "catboost_model.pkl"
 ACCURACY_PATH = "catboost_accuracy.pkl"
@@ -60,7 +74,7 @@ def train_and_update_model():
     st.success(f"✅ Model retrained! New accuracy: {accuracy:.2%}")
 
 # For Columns
-col1, col2, col3 = st.columns(3)
+col1, col2, col3 = st.columns([2,2,1])
 
 with col1:
     # ➕ Add new coffee
