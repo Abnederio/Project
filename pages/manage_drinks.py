@@ -5,6 +5,7 @@ import joblib
 from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+import numpy as np
 
 # ✅ Set layout to wide
 st.set_page_config(layout="wide")
@@ -117,9 +118,13 @@ with col1:
                     "Flavor Notes": flavor_notes,
                     "Bitterness Level": bitterness_level,
                     "Weather": weather,
-                }])
+                }] * 5) 
 
                 df = pd.concat([new_entry, df], ignore_index=True)
+                
+                # 🔀 Shuffle dataset with a dynamic random seed based on total rows
+                random_seed = np.random.randint(0, len(df) + 1)  # Seed within the range of dataset size
+                df = df.sample(frac=1, random_state=random_seed).reset_index(drop=True)
 
                 # ✅ Save with "None" explicitly stored
                 df.to_csv(DATASET_PATH, index=False, na_rep="None")  
