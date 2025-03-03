@@ -19,7 +19,7 @@ st.markdown("""
 # 📌 Paths
 MODEL_PATH = "catboost_model.pkl"
 ACCURACY_PATH = "catboost_accuracy.pkl"
-IMAGE_FOLDER = "images"
+IMAGE_FOLDER = "image"
 DATASET_PATH = "coffee_dataset.csv"
 
 # 📂 Ensure the image folder exists
