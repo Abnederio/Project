@@ -17,5 +17,5 @@ gunicorn
 
 # Database (Only if using PostgreSQL)
 flask-sqlalchemy
-psycopg2
+psycopg2-binary
 
