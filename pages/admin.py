@@ -81,7 +81,7 @@ if not st.session_state.token:
                 st.error("Invalid username or password")
 else:
     st.sidebar.write("✅ Logged in")
-    if st.sidebar.button("Logout"):
+    if st.button("Logout"):
         st.session_state.token = None
         st.rerun()
 
