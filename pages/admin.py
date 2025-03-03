@@ -12,7 +12,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Flask Backend URL
-API_BASE_URL = "http://127.0.0.1:5000"
+API_BASE_URL = "https://project-a2bt.onrender.com"
 
 if st.button("🏠 Go Back to Home"):
     st.switch_page("main.py")
