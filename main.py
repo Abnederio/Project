@@ -10,7 +10,7 @@ import numpy as np
 import google.generativeai as genai
 import requests
 
-API_URL = "http://127.0.0.1:5000" 
+API_URL = "https://project-a2bt.onrender.com" 
 
 if st.button("Check API"):
     response = requests.get(f"{API_URL}/")
