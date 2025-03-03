@@ -15,7 +15,7 @@ st.markdown("""
 API_BASE_URL = "https://project-a2bt.onrender.com"
 
 if st.button("🏠 Go Back to Menu"):
-    st.switch_page("menu.py")
+    st.switch_page("pages/menu.py")
 
 # Function to handle login
 def login(username, password):
