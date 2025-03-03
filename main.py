@@ -121,7 +121,7 @@ if st.button('Recommend', key='rfr_detect'):
     # Display the image
     image_path = f"image/{recommended_coffee}.png"
     if os.path.exists(image_path):
-        st.image(image_path, caption=f"{recommended_coffee}", use_column_width=True)
+        st.image(image_path, caption=f"{recommended_coffee}", use_container_width=True)
     else:
         st.warning("Image not available for this coffee.")
 
