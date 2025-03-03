@@ -1,2 +1,2 @@
 id,username,password,email
-1,admin,admin,admin@gmail.com
+1,admin,$2b$12$2.gu3fhfeYIlHoPMqT4JCuRsQnh3AZ1Sga93MtTRuzf4j8f2vNQmW,admin@gmail.com

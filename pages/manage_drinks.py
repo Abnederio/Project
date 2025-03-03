@@ -7,17 +7,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import numpy as np
 
-# ✅ Set layout to wide
-st.set_page_config(layout="wide")
+st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="wide")  # ✅ Move this to the top
 
 # ✅ Apply custom CSS for a wider main content area
 st.markdown("""
     <style>
-        .main {
-            max-width: 95%;
-            padding-left: 5%;
-            padding-right: 5%;
-        }
+        [data-testid="stSidebar"] { display: none; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -208,4 +203,10 @@ with col3:
             st.rerun()
         else:
             st.warning("⚠️ Selected coffee does not exist in the dataset.")
+            
+if st.button("🏠 Go Back to Menu"):
+    st.switch_page("pages/menu.py")
+if st.button("🚪 Logout"):
+        st.session_state.token = None  # Clear token
+        st.switch_page("pages/admin.py")
 

@@ -18,7 +18,15 @@ def get_explanation(recommended_coffee, features):
     return response.text  # Extract explanation text
 
 # Admin Button
-st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender")
+st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="centered")  # ✅ Move this to the top
+
+# ✅ Apply custom CSS for a wider main content area
+st.markdown("""
+    <style>
+        [data-testid="stSidebar"] { display: none; }
+    </style>
+""", unsafe_allow_html=True)
+
 if st.button("🔑 Admin Login"):
     st.switch_page("pages/admin.py") 
 

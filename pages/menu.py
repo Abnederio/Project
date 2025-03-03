@@ -1,6 +1,13 @@
 import streamlit as st
 
-st.set_page_config(page_title="Admin Menu", layout="wide")
+st.set_page_config(page_title="Admin Menu", layout="wide")  # ✅ Move this to the first line
+
+# ✅ Apply custom CSS for a wider main content area
+st.markdown("""
+    <style>
+        [data-testid="stSidebar"] { display: none; }
+    </style>
+""", unsafe_allow_html=True)
 
 # Ensure user is logged in
 if "token" not in st.session_state or not st.session_state.token:
@@ -28,3 +35,5 @@ with col4:
     if st.button("🚪 Logout"):
         st.session_state.token = None  # Clear token
         st.switch_page("pages/admin.py")
+        
+        

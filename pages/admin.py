@@ -1,6 +1,16 @@
 import streamlit as st
 import requests
 
+
+st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="wide")  # ✅ Move this to the top
+
+# ✅ Apply custom CSS for a wider main content area
+st.markdown("""
+    <style>
+        [data-testid="stSidebar"] { display: none; }
+    </style>
+""", unsafe_allow_html=True)
+
 # Flask Backend URL
 API_BASE_URL = "http://127.0.0.1:5000"
 
