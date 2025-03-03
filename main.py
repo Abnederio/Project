@@ -10,6 +10,8 @@ import numpy as np
 import google.generativeai as genai
 import requests
 
+st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="centered")  # ✅ Move this to the top
+
 API_URL = "https://project-a2bt.onrender.com" 
 
 if st.button("Check API"):
@@ -28,7 +30,7 @@ def get_explanation(recommended_coffee, features):
     return response.text  # Extract explanation text
 
 # Admin Button
-st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="centered")  # ✅ Move this to the top
+
 
 # ✅ Apply custom CSS for a wider main content area
 st.markdown("""
