@@ -22,7 +22,7 @@ st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recomme
 
 # ✅ Apply custom CSS for a wider main content area
 st.markdown("""
-    <style>
+           <style>
         [data-testid="stSidebar"] { display: none; }
     </style>
 """, unsafe_allow_html=True)
