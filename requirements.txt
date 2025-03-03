@@ -11,6 +11,8 @@ catboost
 scikit-learn
 numpy
 pandas
+google-generativeai
+
 
 # Server & Deployment
 gunicorn
