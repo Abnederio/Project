@@ -8,6 +8,16 @@ import joblib
 import os
 import numpy as np
 import google.generativeai as genai
+import requests
+
+API_URL = "http://127.0.0.1:5000" 
+
+if st.button("Check API"):
+    response = requests.get(f"{API_URL}/")
+    if response.status_code == 200:
+        st.success("✅ API is working!")
+    else:
+        st.error("❌ API failed to respond.")
 
 # Set up Gemini API
 genai.configure(api_key="AIzaSyAXpLVdg1s1dpRj0-Crb7HYhr2xHvGUffg")
@@ -49,7 +59,7 @@ if os.path.exists(MODEL_PATH) and os.path.exists(ACCURACY_PATH):
     model = joblib.load(MODEL_PATH)
     accuracy = joblib.load(ACCURACY_PATH)
 else:
-    model = CatBoostClassifier(iterations=150, learning_rate=0.3, depth=6, task_type="GPU", verbose=0)
+    model = CatBoostClassifier(iterations=150, learning_rate=0.3, depth=6, verbose=0)
     model.fit(X_train, y_train, cat_features=cat_features)
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
