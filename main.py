@@ -50,10 +50,6 @@ if st.button("🔍 Check API Status"):
     else:
         st.error("❌ API failed to respond.")
 
-# ✅ Admin Button
-if st.button("🔑 Admin Login"):
-    st.switch_page("pages/admin.py")
-
 # 📥 Load dataset
 df = pd.read_csv("coffee_dataset.csv")
 X = df.drop(columns=['Coffee Name'])
@@ -154,9 +150,10 @@ if st.button("🎯 Recommend Coffee"):
 
 st.divider()
 
-if st.button("🏠 Back to Home"):
-    st.switch_page("pages/menu.py")
-
+# ✅ Admin Button
+if st.button("🔑 Admin Login"):
+    st.switch_page("pages/admin.py")
+# ✅ Logout Button
 if st.button("🚪 Logout"):
     st.session_state.token = None
     st.switch_page("pages/admin.py")
