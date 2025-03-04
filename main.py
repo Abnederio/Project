@@ -153,10 +153,7 @@ st.divider()
 # ✅ Admin Button
 if st.button("🔑 Admin Login"):
     st.switch_page("pages/admin.py")
-# ✅ Logout Button
-if st.button("🚪 Logout"):
-    st.session_state.token = None
-    st.switch_page("pages/admin.py")
+
 
     
 
