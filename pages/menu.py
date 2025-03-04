@@ -1,23 +1,40 @@
 import streamlit as st
 
-st.set_page_config(page_title="Admin Menu", layout="wide")  # ✅ Move this to the first line
+# ✅ Move config to the top
+st.set_page_config(page_title="Admin Menu", layout="wide")
 
-# ✅ Apply custom CSS for a wider main content area
+# ✅ Custom CSS for a cleaner UI
 st.markdown("""
     <style>
-        [data-testid="stSidebar"] { display: none; }
+        [data-testid="stSidebar"] { display: none; }  /* Hide Sidebar */
+        div.stButton > button {
+            width: 100%;
+            border-radius: 10px;
+            background-color: #0078D4;
+            color: white;
+            font-size: 18px;
+            padding: 10px;
+            transition: all 0.3s ease-in-out;
+        }
+        div.stButton > button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
     </style>
 """, unsafe_allow_html=True)
 
-# Ensure user is logged in
+# ✅ Ensure user is logged in
 if "token" not in st.session_state or not st.session_state.token:
-    st.warning("Please login first.")
     st.switch_page("pages/admin.py")
 
+# ✅ Title with spacing
 st.title("☕ Admin Dashboard")
+st.markdown("### Manage everything from here")
 
-# Menu buttons
-col1, col2, col3, col4 = st.columns(4)
+# ✅ Centered menu buttons
+st.divider()  # Add a divider for better separation
+
+col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 
 with col1:
     if st.button("📊 Dashboard"):
@@ -35,5 +52,7 @@ with col4:
     if st.button("🚪 Logout"):
         st.session_state.token = None  # Clear token
         st.switch_page("pages/admin.py")
+
+st.divider() 
         
         
