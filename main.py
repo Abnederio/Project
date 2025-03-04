@@ -37,7 +37,7 @@ st.markdown("""
         }
         h1, h2, h3 {
             text-align: center;
-            color: #4E342E;
+            color: #F28C28;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -89,16 +89,16 @@ st.markdown("#### ☕ Select Your Preferences")
 col1, col2 = st.columns(2)
 
 with col1:
-    caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'])
-    sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'])
-    drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'])
-    roast_level = st.selectbox('Roast Level:', ['Medium', 'None', 'Dark'])
+    caffeine_level = st.selectbox('☕ Caffeine Level:', ['Low', 'Medium', 'High'])
+    sweetness = st.selectbox('🍬 Sweetness:', ['Low', 'Medium', 'High'])
+    drink_type = st.selectbox('❄️ Drink Type:', ['Frozen', 'Iced', 'Hot'])
+    roast_level = st.selectbox('🔥 Roast Level:', ['Medium', 'None', 'Dark'])
 
 with col2:
-    milk_type = 'Dairy' if st.toggle("Do you want milk?") else 'No Dairy'
-    flavor_notes = st.selectbox('Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'])
-    bitterness_level = st.selectbox('Bitterness Level:', ['Low', 'Medium', 'High'])
-    weather = st.selectbox('Weather:', ['Hot', 'Cold'])
+    milk_type = 'Dairy' if st.toggle("🥛 Do you want milk?") else 'No Dairy'
+    flavor_notes = st.selectbox('🍫 Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'])
+    bitterness_level = st.selectbox('🏴 Bitterness Level:', ['Low', 'Medium', 'High'])
+    weather = st.selectbox('🌡 Weather:', ['Hot', 'Cold'])
 
 st.divider()  
 
@@ -123,22 +123,31 @@ features = f"""
 if st.button("🎯 Recommend Coffee"):
     rfr_input_data = [[caffeine_level, sweetness, drink_type, roast_level, milk_type, flavor_notes, bitterness_level, weather]]
     rfr_prediction = model.predict(rfr_input_data)
-    recommended_coffee = str(rfr_prediction[0])
-
-    st.session_state.recommended_coffee = recommended_coffee  
+    
+    # ✅ Fix: Remove [''] from output
+    recommended_coffee = rfr_prediction[0] if isinstance(rfr_prediction, (list, np.ndarray)) else rfr_prediction  
+    recommended_coffee = str(recommended_coffee).strip("[]'")  # Remove unwanted characters
 
     st.success(f"☕ **Your ideal coffee is: {recommended_coffee}**")
 
-    image_path = f"image/{recommended_coffee}.png"
-    if os.path.exists(image_path):
-        st.image(image_path, caption=f"Your coffee: {recommended_coffee}", use_container_width=True)
+    # ✅ Fix: Check multiple image formats (.png, .jpg, .jpeg)
+    image_path = None
+    for ext in ["png", "jpg", "jpeg"]:
+        possible_path = f"image/{recommended_coffee}.{ext}"
+        if os.path.exists(possible_path):
+            image_path = possible_path
+            break  # Stop checking once found
+
+    # ✅ Display Image if found
+    if image_path:
+        st.image(image_path, caption=f"Your coffee: {recommended_coffee}")
     else:
         st.warning("⚠️ No image available for this coffee.")
 
-    # Gemini AI Explanation
+    # ✅ Gemini AI Explanation
     genai.configure(api_key="AIzaSyAXpLVdg1s1dpRj0-Crb7HYhr2xHvGUffg")
-    model = genai.GenerativeModel("gemini-2.0-flash")  
-    response = model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features}. Explain to the end-user why is it ideal coffee for her/him. Make it only 5 sentences.")
+    model = genai.GenerativeModel("gemini-2.0-flash")
+    response = model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features}. Explain to the end-user why it is the ideal coffee for them in only 5 sentences.")
     
     explanation = response.text
 
@@ -153,6 +162,8 @@ st.divider()
 # ✅ Admin Button
 if st.button("🔑 Admin Login"):
     st.switch_page("pages/admin.py")
+
+
 
 
     
