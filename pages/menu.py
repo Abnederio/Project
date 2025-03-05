@@ -1,7 +1,10 @@
 import streamlit as st
+import requests
 
 # ✅ Move config to the top
 st.set_page_config(page_title="Admin Menu", layout="wide")
+
+API_URL = "https://project-a2bt.onrender.com"
 
 # ✅ Custom CSS for a cleaner UI
 st.markdown("""
@@ -34,7 +37,7 @@ st.markdown("### Manage everything from here")
 # ✅ Centered menu buttons
 st.divider()  # Add a divider for better separation
 
-col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
 
 with col1:
     if st.button("📊 Dashboard"):
@@ -49,6 +52,14 @@ with col3:
         st.switch_page("pages/admin.py")
 
 with col4:
+    if st.button("📡 Check API status"):
+        response = requests.get(f"{API_URL}/")
+        if response.status_code == 200:
+            st.success("✅ API is working!")
+        else:
+            st.error("❌ API failed to respond.")
+
+with col5:
     if st.button("🚪 Logout"):
         st.session_state.token = None  # Clear token
         st.switch_page("pages/admin.py")
