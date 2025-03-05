@@ -146,6 +146,7 @@ with col2:
     selected_coffee = st.selectbox("Select coffee to update:", coffee_names)
 
     if selected_coffee:
+        df["Roast Level"] = df["Roast Level"].fillna("None")
         coffee_data = df[df["Coffee Name"] == selected_coffee].iloc[0]
 
         new_caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Caffeine Level"]))
