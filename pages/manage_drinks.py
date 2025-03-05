@@ -144,16 +144,57 @@ with col2:
 
     if selected_coffee:
         coffee_data = df[df["Coffee Name"] == selected_coffee].iloc[0]
+        new_caffeine_level = st.selectbox(
+            'Caffeine Level:', 
+            ['Low', 'Medium', 'High'], 
+            index=['Low', 'Medium', 'High'].index(coffee_data["Caffeine Level"])
+        )
 
-        new_caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Caffeine Level"]))
-        new_sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Sweetness"]))
-        new_weather = st.selectbox('Weather:', ['Hot', 'Cold'], index=['Hot', 'Cold'].index(coffee_data["Weather"]))
+        new_sweetness = st.selectbox(
+            'Sweetness:', 
+            ['Low', 'Medium', 'High'], 
+            index=['Low', 'Medium', 'High'].index(coffee_data["Sweetness"])
+        )
+
+        new_drink_type = st.selectbox(
+            'Drink Type:', 
+            ['Frozen', 'Iced', 'Hot'], 
+            index=['Frozen', 'Iced', 'Hot'].index(coffee_data["Type"])  # Fixed
+        )
+
+        new_roast_level = st.selectbox(
+            'Roast Level:', 
+            ['Medium', 'None', 'Dark'], 
+            index=['Medium', 'None', 'Dark'].index(coffee_data["Roast Level"])  # Fixed
+        )
+
+        new_milk_type = 'Dairy' if st.toggle("Do you want milk?", value=(coffee_data["Milk Type"] == 'Dairy')) else 'No Dairy'
+
+        new_flavor_notes = st.selectbox(
+            'Flavor Notes:', 
+            ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'], 
+            index=['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'].index(coffee_data["Flavor Notes"])  # Fixed
+        )
+
+        new_bitterness_level = st.selectbox(
+            'Bitterness Level:', 
+            ['Low', 'Medium', 'High'], 
+            index=['Low', 'Medium', 'High'].index(coffee_data["Bitterness Level"])  # Fixed
+        )
+
+        new_weather = st.selectbox(
+            'Weather:', 
+            ['Hot', 'Cold'], 
+            index=['Hot', 'Cold'].index(coffee_data["Weather"])  # Fixed
+        )
+
 
         # 📸 Option to Upload a New Image
         new_image = st.file_uploader("Upload new image", type=['jpg', 'jpeg', 'png'])
 
         if st.button("Update Coffee"):
-            df.loc[df["Coffee Name"] == selected_coffee, ["Caffeine Level", "Sweetness", "Weather"]] = [new_caffeine_level, new_sweetness, new_weather]
+            df.loc[df["Coffee Name"] == selected_coffee, ["Caffeine Level", "Sweetness", "Type", "Roast Level", "Milk Type", "Flavor Notes", "Bitterness Level", "Weather"]] = [new_caffeine_level, new_sweetness, new_drink_type, new_roast_level,
+                                                                                                                new_milk_type, new_flavor_notes, new_bitterness_level, new_weather]
 
             df.to_csv(DATASET_PATH, index=False, na_rep="None")
 
