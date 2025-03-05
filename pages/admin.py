@@ -14,9 +14,6 @@ st.markdown("""
 # Flask Backend URL
 API_BASE_URL = "https://project-a2bt.onrender.com"
 
-if st.button("🏠 Go Back to Home"):
-    st.switch_page("main.py")
-
 # Function to handle login
 def login(username, password):
     response = requests.post(f"{API_BASE_URL}/login", json={"username": username, "password": password})
