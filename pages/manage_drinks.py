@@ -125,6 +125,12 @@ with col1:
 
                 df = pd.concat([new_entry, df], ignore_index=True)
                 df.to_csv(DATASET_PATH, index=False, na_rep="None")  
+                
+                # ✅ Push CSV and Image to GitHub
+                os.system(f"git add {DATASET_PATH}")
+                os.system(f"git add {image_path}")  # Add the new image
+                os.system('git commit -m "Updated coffee dataset and added image: {name}"')
+                os.system("git push origin main")  # Adjust the branch name if necessary
 
                 st.success(f"☕ {name} added successfully!")
                 train_and_update_model()
@@ -143,10 +149,26 @@ with col2:
         new_sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Sweetness"]))
         new_weather = st.selectbox('Weather:', ['Hot', 'Cold'], index=['Hot', 'Cold'].index(coffee_data["Weather"]))
 
+        # 📸 Option to Upload a New Image
+        new_image = st.file_uploader("Upload new image", type=['jpg', 'jpeg', 'png'])
+
         if st.button("Update Coffee"):
             df.loc[df["Coffee Name"] == selected_coffee, ["Caffeine Level", "Sweetness", "Weather"]] = [new_caffeine_level, new_sweetness, new_weather]
 
             df.to_csv(DATASET_PATH, index=False, na_rep="None")
+
+            # ✅ Save and Push New Image (if uploaded)
+            if new_image:
+                image_path = os.path.join(IMAGE_FOLDER, f"{selected_coffee.replace(' ', '_')}.png")
+                with open(image_path, "wb") as f:
+                    f.write(new_image.getbuffer())
+                os.system(f"git add {image_path}")  # Track new image
+            
+            # ✅ Push updates to GitHub
+            os.system(f"git add {DATASET_PATH}")
+            os.system(f'git commit -m "Updated {selected_coffee} details and image"')
+            os.system("git push origin main")
+
             st.success(f"✅ {selected_coffee} updated successfully!")
             train_and_update_model()
             st.rerun()
@@ -159,6 +181,18 @@ with col3:
     if st.button("Delete Coffee"):
         df = df[df["Coffee Name"] != delete_coffee]
         df.to_csv(DATASET_PATH, index=False, na_rep="None")
+        
+        # ✅ Remove Image from Local Storage and GitHub
+        image_path = os.path.join(IMAGE_FOLDER, f"{delete_coffee.replace(' ', '_')}.png")
+        if os.path.exists(image_path):
+            os.remove(image_path)  # Delete from local storage
+            os.system(f"git rm {image_path}")  # Remove from Git tracking
+
+        # ✅ Push changes to GitHub
+        os.system(f"git add {DATASET_PATH}")
+        os.system(f'git commit -m "Deleted coffee: {delete_coffee}"')
+        os.system("git push origin main")
+        
         st.success(f"🗑 {delete_coffee} deleted successfully!")
         train_and_update_model()
         st.rerun()
