@@ -140,7 +140,10 @@ else:
         
         st.divider()
 
-        if st.button("🏠 Go Back to Menu"):
+        if st.button("🏠 Go Back to Home"):
+            st.switch_page("main.py")
+            
+        if st.button("📜 Go Back to Menu"):
             st.switch_page("pages/menu.py")
 
         if st.button("🚪 Logout"):
