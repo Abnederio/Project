@@ -139,6 +139,34 @@ with col1:
                 train_and_update_model()
                 st.rerun()
 
+# ✏️ **Update Coffee**
+with col2:
+    st.markdown("### ✏️ Update Coffee")
+    coffee_names = df["Coffee Name"].dropna().unique()
+    selected_coffee = st.selectbox("Select coffee to update:", coffee_names)
+
+    if selected_coffee:
+        coffee_data = df[df["Coffee Name"] == selected_coffee].iloc[0]
+
+        new_caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Caffeine Level"]))
+        new_sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Sweetness"]))
+        new_drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'], index=['Frozen', 'Iced', 'Hot'].index(coffee_data["Type"]))
+        new_roast_level = st.selectbox('Roast Level:', ['Medium', 'None', 'Dark'], index=['Medium', 'None', 'Dark'].index(coffee_data["Roast Level"]))
+        new_flavor_notes = st.selectbox('Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'], index=['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'].index(coffee_data["Flavor Notes"]))
+        new_weather = st.selectbox('Weather:', ['Hot', 'Cold'], index=['Hot', 'Cold'].index(coffee_data["Weather"]))
+
+        if st.button("Update Coffee"):
+            df.loc[df["Coffee Name"] == selected_coffee, ["Caffeine Level", "Sweetness", "Type", "Roast Level", "Flavor Notes", "Weather"]] = [new_caffeine_level, new_sweetness, new_drink_type, new_roast_level, new_flavor_notes, new_weather]
+
+            df.to_csv(DATASET_PATH, index=False, na_rep="None")
+            subprocess.run(["git", "add", DATASET_PATH])
+            subprocess.run(["git", "commit", "-m", f"Updated coffee: {selected_coffee}"])
+            subprocess.run(["git", "push", "origin", "main"])
+
+            st.success(f"✅ {selected_coffee} updated successfully!")
+            train_and_update_model()
+            st.rerun()
+
 # 🗑 **Delete Coffee**
 with col3:
     st.markdown("### 🗑 Delete Coffee")
