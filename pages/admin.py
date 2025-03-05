@@ -137,15 +137,17 @@ else:
             else:
                 st.error("Failed to delete admin")
             st.rerun()
+        
+        st.divider()
+
+        if st.button("🏠 Go Back to Menu"):
+            st.switch_page("pages/menu.py")
+
+        if st.button("🚪 Logout"):
+            st.session_state.token = None
+            st.switch_page("pages/admin.py")
             
-st.divider()
 
-if st.button("🏠 Go Back to Menu"):
-    st.switch_page("pages/menu.py")
-
-if st.button("🚪 Logout"):
-    st.session_state.token = None
-    st.switch_page("pages/admin.py")
 
 
 
