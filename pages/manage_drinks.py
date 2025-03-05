@@ -124,10 +124,13 @@ with col1:
                     "Flavor Notes": flavor_notes,
                     "Bitterness Level": bitterness_level,
                     "Weather": weather,
-                }]) 
+                }] * 10) 
 
                 df = pd.concat([new_entry, df], ignore_index=True)
                 df.to_csv(DATASET_PATH, index=False, na_rep="None")  
+                # 🔀 Shuffle dataset with a dynamic random seed based on total rows
+                random_seed = np.random.randint(0, len(df) + 1)  # Seed within the range of dataset size
+                df = df.sample(frac=1, random_state=random_seed).reset_index(drop=True)
                 
                 # ✅ Push CSV and Image to GitHub
                 subprocess.run(["git", "add", DATASET_PATH])
@@ -181,7 +184,7 @@ with col3:
         image_path = os.path.join(IMAGE_FOLDER, f"{delete_coffee.replace(' ', '_')}.png")
         if os.path.exists(image_path):
             os.remove(image_path)
-            subprocess.run(["git", "rm", image_path])
+            subprocess.run(["git", "rm", "--ignore-unmatch", image_path])
 
         # ✅ Push changes to GitHub
         subprocess.run(["git", "add", DATASET_PATH])
