@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 import joblib
+import subprocess
 from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
@@ -46,9 +47,9 @@ df = pd.read_csv(DATASET_PATH, na_values=["None"])
 st.title("🥤 Manage Drinks")
 st.markdown("### Easily Add, Edit, or Remove Coffee Menu Items")
 
-# 📋 Show current coffee menu with better layout
+# 📋 Show current coffee menu
 st.markdown("#### ☕ Current Coffee Menu")
-st.dataframe(df.style.set_table_styles([{"selector": "th", "props": [("font-size", "14px"), ("text-align", "center")]}]))
+st.dataframe(df)
 
 st.divider()  # Separate sections
 
@@ -86,7 +87,7 @@ with col1:
     with st.form("add_coffee"):
         st.markdown("### ➕ Add New Coffee")
 
-        name = st.text_input("Coffee Name", placeholder="Enter coffee name...")
+        name = st.text_input("Coffee Name", placeholder="Enter coffee name...").strip()
         caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'])
         sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'])
         drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'])
@@ -104,6 +105,8 @@ with col1:
         if submit:
             if not name:
                 st.error("❌ Coffee Name is required!")
+            elif name in df["Coffee Name"].values:
+                st.error("⚠️ Coffee already exists!")
             else:
                 image_path = os.path.join(IMAGE_FOLDER, f"{name.replace(' ', '_')}.png")
                 if image_file:
@@ -121,98 +124,20 @@ with col1:
                     "Flavor Notes": flavor_notes,
                     "Bitterness Level": bitterness_level,
                     "Weather": weather,
-                }] * 5) 
+                }]) 
 
                 df = pd.concat([new_entry, df], ignore_index=True)
                 df.to_csv(DATASET_PATH, index=False, na_rep="None")  
                 
                 # ✅ Push CSV and Image to GitHub
-                os.system(f"git add {DATASET_PATH}")
-                os.system(f"git add {image_path}")  # Add the new image
-                os.system('git commit -m "Updated coffee dataset and added image: {name}"')
-                os.system("git push origin main")  # Adjust the branch name if necessary
+                subprocess.run(["git", "add", DATASET_PATH])
+                subprocess.run(["git", "add", image_path])
+                subprocess.run(["git", "commit", "-m", f"Updated coffee dataset and added image: {name}"])
+                subprocess.run(["git", "push", "origin", "main"])
 
                 st.success(f"☕ {name} added successfully!")
                 train_and_update_model()
                 st.rerun()
-
-# ✏️ **Update Coffee**
-with col2:
-    st.markdown("### ✏️ Update Coffee")
-    coffee_names = df["Coffee Name"].dropna().unique()  
-    selected_coffee = st.selectbox("Select coffee to update:", coffee_names)
-
-    if selected_coffee:
-        coffee_data = df[df["Coffee Name"] == selected_coffee].iloc[0]
-        new_caffeine_level = st.selectbox(
-            'Caffeine Level:', 
-            ['Low', 'Medium', 'High'], 
-            index=['Low', 'Medium', 'High'].index(coffee_data["Caffeine Level"])
-        )
-
-        new_sweetness = st.selectbox(
-            'Sweetness:', 
-            ['Low', 'Medium', 'High'], 
-            index=['Low', 'Medium', 'High'].index(coffee_data["Sweetness"])
-        )
-
-        new_drink_type = st.selectbox(
-            'Drink Type:', 
-            ['Frozen', 'Iced', 'Hot'], 
-            index=['Frozen', 'Iced', 'Hot'].index(coffee_data["Type"])  # Fixed
-        )
-
-        new_roast_level = st.selectbox(
-            'Roast Level:', 
-            ['Medium', 'None', 'Dark'], 
-            index=['Medium', 'None', 'Dark'].index(coffee_data["Roast Level"])  # Fixed
-        )
-
-        new_milk_type = 'Dairy' if st.toggle("Do you want milk?", value=(coffee_data["Milk Type"] == 'Dairy')) else 'No Dairy'
-
-        new_flavor_notes = st.selectbox(
-            'Flavor Notes:', 
-            ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'], 
-            index=['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'].index(coffee_data["Flavor Notes"])  # Fixed
-        )
-
-        new_bitterness_level = st.selectbox(
-            'Bitterness Level:', 
-            ['Low', 'Medium', 'High'], 
-            index=['Low', 'Medium', 'High'].index(coffee_data["Bitterness Level"])  # Fixed
-        )
-
-        new_weather = st.selectbox(
-            'Weather:', 
-            ['Hot', 'Cold'], 
-            index=['Hot', 'Cold'].index(coffee_data["Weather"])  # Fixed
-        )
-
-
-        # 📸 Option to Upload a New Image
-        new_image = st.file_uploader("Upload new image", type=['jpg', 'jpeg', 'png'])
-
-        if st.button("Update Coffee"):
-            df.loc[df["Coffee Name"] == selected_coffee, ["Caffeine Level", "Sweetness", "Type", "Roast Level", "Milk Type", "Flavor Notes", "Bitterness Level", "Weather"]] = [new_caffeine_level, new_sweetness, new_drink_type, new_roast_level,
-                                                                                                                new_milk_type, new_flavor_notes, new_bitterness_level, new_weather]
-
-            df.to_csv(DATASET_PATH, index=False, na_rep="None")
-
-            # ✅ Save and Push New Image (if uploaded)
-            if new_image:
-                image_path = os.path.join(IMAGE_FOLDER, f"{selected_coffee.replace(' ', '_')}.png")
-                with open(image_path, "wb") as f:
-                    f.write(new_image.getbuffer())
-                os.system(f"git add {image_path}")  # Track new image
-            
-            # ✅ Push updates to GitHub
-            os.system(f"git add {DATASET_PATH}")
-            os.system(f'git commit -m "Updated {selected_coffee} details and image"')
-            os.system("git push origin main")
-
-            st.success(f"✅ {selected_coffee} updated successfully!")
-            train_and_update_model()
-            st.rerun()
 
 # 🗑 **Delete Coffee**
 with col3:
@@ -226,14 +151,14 @@ with col3:
         # ✅ Remove Image from Local Storage and GitHub
         image_path = os.path.join(IMAGE_FOLDER, f"{delete_coffee.replace(' ', '_')}.png")
         if os.path.exists(image_path):
-            os.remove(image_path)  # Delete from local storage
-            os.system(f"git rm {image_path}")  # Remove from Git tracking
+            os.remove(image_path)
+            subprocess.run(["git", "rm", image_path])
 
         # ✅ Push changes to GitHub
-        os.system(f"git add {DATASET_PATH}")
-        os.system(f'git commit -m "Deleted coffee: {delete_coffee}"')
-        os.system("git push origin main")
-        
+        subprocess.run(["git", "add", DATASET_PATH])
+        subprocess.run(["git", "commit", "-m", f"Deleted coffee: {delete_coffee}"])
+        subprocess.run(["git", "push", "origin", "main"])
+
         st.success(f"🗑 {delete_coffee} deleted successfully!")
         train_and_update_model()
         st.rerun()
@@ -246,4 +171,5 @@ if st.button("🏠 Go Back to Menu"):
 if st.button("🚪 Logout"):
     st.session_state.token = None
     st.switch_page("pages/admin.py")
+
 
