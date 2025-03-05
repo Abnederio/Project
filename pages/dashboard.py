@@ -67,7 +67,6 @@ dataset = pd.read_csv("data/IRIS.csv")
 # About Page
 if st.session_state.page_selection == "about":
     st.header("ℹ️ About")
-    menu.df
     # Your content for the ABOUT page goes here
 
 # Dataset Page
