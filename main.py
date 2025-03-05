@@ -12,8 +12,6 @@ import requests
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="centered")
 
-API_URL = "https://project-a2bt.onrender.com"
-
 # ✅ Custom CSS for a sleek UI
 st.markdown("""
     <style>
@@ -41,14 +39,6 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
-
-# 📌 Check API Status
-if st.button("🔍 Check API Status"):
-    response = requests.get(f"{API_URL}/")
-    if response.status_code == 200:
-        st.success("✅ API is working!")
-    else:
-        st.error("❌ API failed to respond.")
 
 # 📥 Load dataset
 df = pd.read_csv("coffee_dataset.csv")
