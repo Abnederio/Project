@@ -127,10 +127,11 @@ with col1:
                 }] * 10) 
 
                 df = pd.concat([new_entry, df], ignore_index=True)
-                df.to_csv(DATASET_PATH, index=False, na_rep="None")  
-                # 🔀 Shuffle dataset with a dynamic random seed based on total rows
                 random_seed = np.random.randint(0, len(df) + 1)  # Seed within the range of dataset size
                 df = df.sample(frac=1, random_state=random_seed).reset_index(drop=True)
+                df.to_csv(DATASET_PATH, index=False, na_rep="None")  
+                # 🔀 Shuffle dataset with a dynamic random seed based on total rows
+                
                 
                 # ✅ Push CSV and Image to GitHub
                 subprocess.run(["git", "add", DATASET_PATH])
