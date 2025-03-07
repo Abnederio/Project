@@ -84,45 +84,37 @@ elif st.session_state.page_selection == "dataset":
 # EDA Page
 elif st.session_state.page_selection == "eda":
     st.header("📈 Exploratory Data Analysis (EDA)")
-
     
-    col = st.columns((1.5, 4.5, 2), gap='medium')
-
-    # Your content for the EDA page goes here
-
-    with col[0]:
-        st.markdown('#### Graphs Column 1')
-
-
-    with col[1]:
-        st.markdown('#### Graphs Column 2')
-        
-    with col[2]:
-        st.markdown('#### Graphs Column 3')
+    st.subheader("Bar Chart of Key Attributes")
+    
+    selected_column = st.selectbox("Select an Attribute to Visualize", dataset.columns)
+    
+    bar_chart = px.bar(dataset, x='Coffee Name', y=selected_column, title=f'Distribution of {selected_column}')
+    st.plotly_chart(bar_chart)
 
 # Data Cleaning Page
 elif st.session_state.page_selection == "data_cleaning":
     st.header("🧼 Data Cleaning and Data Pre-processing")
 
-    # Content for the DATA CLEANING / PREPROCESSING page goes here (wala naman no?)
+    # Your content for the DATA CLEANING / PREPROCESSING page goes here
 
 # Machine Learning Page
 elif st.session_state.page_selection == "machine_learning":
     st.header("🤖 Machine Learning")
 
-    # Content for the MACHINE LEARNING page goes here
+    # Your content for the MACHINE LEARNING page goes here
 
 # Prediction Page
 elif st.session_state.page_selection == "prediction":
     st.header("👀 Prediction")
 
-    # Content for the PREDICTION page goes here
+    # Your content for the PREDICTION page goes here
 
 # Conclusions Page
 elif st.session_state.page_selection == "conclusion":
     st.header("📝 Conclusion")
 
-    # Content for the CONCLUSION page goes here
+    # Your content for the CONCLUSION page goes here
     
 st.divider()
 
