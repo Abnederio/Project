@@ -104,25 +104,25 @@ elif st.session_state.page_selection == "eda":
 elif st.session_state.page_selection == "data_cleaning":
     st.header("🧼 Data Cleaning and Data Pre-processing")
 
-    # Your content for the DATA CLEANING / PREPROCESSING page goes here
+    # Content for the DATA CLEANING / PREPROCESSING page goes here (wala naman no?)
 
 # Machine Learning Page
 elif st.session_state.page_selection == "machine_learning":
     st.header("🤖 Machine Learning")
 
-    # Your content for the MACHINE LEARNING page goes here
+    # Content for the MACHINE LEARNING page goes here
 
 # Prediction Page
 elif st.session_state.page_selection == "prediction":
     st.header("👀 Prediction")
 
-    # Your content for the PREDICTION page goes here
+    # Content for the PREDICTION page goes here
 
 # Conclusions Page
 elif st.session_state.page_selection == "conclusion":
     st.header("📝 Conclusion")
 
-    # Your content for the CONCLUSION page goes here
+    # Content for the CONCLUSION page goes here
     
 st.divider()
 
