@@ -52,14 +52,13 @@ with st.sidebar:
 
     # Project Members
     st.subheader("Members")
-    st.markdown("1. Andrei Bernard Turgo\n2. Jeff Bezos\n3. Sam Altman\n4. Mark Zuckerberg")
+    st.markdown("1. Nikkos Adrielle Dantes\n2. Elijah Erle Reyes\n3. Alistair Aaron Torres\n4. Andrei Bernard Turgo")
 
 #######################
 # Data
 
 # Load data
 dataset = pd.read_csv("coffee_dataset.csv")
-
 #######################
 
 # Pages
@@ -71,12 +70,16 @@ if st.session_state.page_selection == "about":
 
 # Dataset Page
 elif st.session_state.page_selection == "dataset":
-    st.header("📊 Dataset")
-
-    st.write("IRIS Flower Dataset")
-    st.write("")
-
-    # Your content for your DATASET page goes here
+    st.header("📊 Coffee Dataset")
+    
+    st.write("This dataset contains various coffee types with attributes such as caffeine level, sweetness, type, roast level, milk type, flavor notes, and bitterness level.")
+    
+    st.dataframe(dataset)  # Display the dataset as a table
+    
+    # Pie Chart
+    st.subheader("📊 Coffee Type Distribution")
+    pie_chart = px.pie(dataset, names='Coffee Name', title='Coffee Type Percentage')
+    st.plotly_chart(pie_chart)
 
 # EDA Page
 elif st.session_state.page_selection == "eda":
