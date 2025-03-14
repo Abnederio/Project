@@ -2,82 +2,39 @@ import streamlit as st
 import pandas as pd
 import os
 import joblib
-import subprocess
-from catboost import CatBoostClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
 import numpy as np
+from oauth2client.service_account import ServiceAccountCredentials
+import gspread
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="wide")
 
-# ✅ Custom CSS for a sleek UI
-st.markdown("""
-    <style>
-        [data-testid="stSidebar"] { display: none; }  /* Hide Sidebar */
-        div.stButton > button {
-            width: 100%;
-            border-radius: 10px;
-            background-color: #008CBA;
-            color: white;
-            font-size: 18px;
-            padding: 10px;
-            transition: all 0.3s ease-in-out;
-        }
-        div.stButton > button:hover {
-            background-color: #005f7f;
-            transform: scale(1.05);
-        }
-        div[data-testid="stDataFrame"] { 
-            height: 350px !important; 
-        }
-    </style>
-""", unsafe_allow_html=True)
+# 🔹 Google Sheets Setup
+SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"  # Your Google Sheet ID
+SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+CREDS_FILE = "credentials.json"  # Your Google API credentials
 
-# 📌 Paths
-MODEL_PATH = "catboost_model.pkl"
-ACCURACY_PATH = "catboost_accuracy.pkl"
-IMAGE_FOLDER = "image"
-DATASET_PATH = "coffee_dataset.csv"
+# 🔹 Authenticate with Google Sheets
+creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
+client = gspread.authorize(creds)
+sheet = client.open_by_key(SHEET_ID).sheet1  # Access the first sheet
 
-os.makedirs(IMAGE_FOLDER, exist_ok=True)  # Ensure image folder exists
+# 🔹 Load Data from Google Sheets
+def load_google_sheet():
+    data = sheet.get_all_records()
+    return pd.DataFrame(data)
 
-# 📥 Load dataset
-df = pd.read_csv(DATASET_PATH, na_values=["None"])  
+df = load_google_sheet()
+
+# 🔹 Save Data to Google Sheets
+def save_to_google_sheet(df):
+    sheet.clear()  # Clear existing data
+    sheet.update([df.columns.values.tolist()] + df.values.tolist())  # Upload new data
 
 st.title("🥤 Manage Drinks")
-st.markdown("### Easily Add, Edit, or Remove Coffee Menu Items")
-
-# 📋 Show current coffee menu
-st.markdown("#### ☕ Current Coffee Menu")
-st.dataframe(df)
+st.markdown("### ☕ Current Coffee Menu")
+st.dataframe(df)  # Display Google Sheets data in Streamlit
 
 st.divider()  # Separate sections
-
-# 🔄 Function to train and update the model
-def train_and_update_model():
-    st.info("🔄 Retraining the model...")
-
-    df = pd.read_csv(DATASET_PATH, na_values=["None"])
-    df = df.loc[:, ~df.columns.str.contains('^Unnamed')]  # Remove unwanted columns
-
-    features = ["Caffeine Level", "Sweetness", "Type", "Roast Level", "Milk Type", 
-                "Flavor Notes", "Bitterness Level", "Weather"]
-    target = "Coffee Name"
-
-    df[features] = df[features].fillna("Unknown")  
-
-    X_train, X_test, y_train, y_test = train_test_split(df[features], df[target], test_size=0.3, random_state=42)
-
-    model = CatBoostClassifier(iterations=150, learning_rate=0.3, depth=6, verbose=0)
-    model.fit(X_train, y_train, cat_features=features)
-
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-
-    joblib.dump(model, MODEL_PATH)
-    joblib.dump(accuracy, ACCURACY_PATH)
-
-    st.success(f"✅ Model retrained! New accuracy: {accuracy:.2%}")
 
 # 🎨 **Columns for Better Layout**
 col1, col2, col3 = st.columns([2, 2, 1])
@@ -97,9 +54,6 @@ with col1:
         bitterness_level = st.selectbox('Bitterness Level:', ['Low', 'Medium', 'High'])
         weather = st.selectbox('Weather:', ['Hot', 'Cold'])
 
-        # 📸 Upload Image
-        image_file = st.file_uploader("Upload an image for the coffee", type=['jpg', 'jpeg', 'png'])
-
         submit = st.form_submit_button("Add Coffee")
 
         if submit:
@@ -108,12 +62,6 @@ with col1:
             elif name in df["Coffee Name"].values:
                 st.error("⚠️ Coffee already exists!")
             else:
-                image_path = os.path.join(IMAGE_FOLDER, f"{name.replace(' ', '_')}.png")
-                if image_file:
-                    with open(image_path, "wb") as f:
-                        f.write(image_file.getbuffer())
-                    st.success("📸 Image uploaded successfully!")
-
                 new_entry = pd.DataFrame([{
                     "Coffee Name": name,
                     "Caffeine Level": caffeine_level,
@@ -124,23 +72,13 @@ with col1:
                     "Flavor Notes": flavor_notes,
                     "Bitterness Level": bitterness_level,
                     "Weather": weather,
-                }] * 10) 
+                }])
 
                 df = pd.concat([new_entry, df], ignore_index=True)
-                random_seed = np.random.randint(0, len(df) + 1)  # Seed within the range of dataset size
-                df = df.sample(frac=1, random_state=random_seed).reset_index(drop=True)
-                df.to_csv(DATASET_PATH, index=False, na_rep="None")  
-                # 🔀 Shuffle dataset with a dynamic random seed based on total rows
-                
-                
-                # ✅ Push CSV and Image to GitHub
-                subprocess.run(["git", "add", DATASET_PATH])
-                subprocess.run(["git", "add", image_path])
-                subprocess.run(["git", "commit", "-m", f"Updated coffee dataset and added image: {name}"])
-                subprocess.run(["git", "push", "origin", "main"])
+                df = df.sample(frac=1).reset_index(drop=True)  # Shuffle dataset
+                save_to_google_sheet(df)  # ✅ Save directly to Google Sheets
 
                 st.success(f"☕ {name} added successfully!")
-                train_and_update_model()
                 st.rerun()
 
 # ✏️ **Update Coffee**
@@ -163,13 +101,8 @@ with col2:
         if st.button("Update Coffee"):
             df.loc[df["Coffee Name"] == selected_coffee, ["Caffeine Level", "Sweetness", "Type", "Roast Level", "Flavor Notes", "Weather"]] = [new_caffeine_level, new_sweetness, new_drink_type, new_roast_level, new_flavor_notes, new_weather]
 
-            df.to_csv(DATASET_PATH, index=False, na_rep="None")
-            subprocess.run(["git", "add", DATASET_PATH])
-            subprocess.run(["git", "commit", "-m", f"Updated coffee: {selected_coffee}"])
-            subprocess.run(["git", "push", "origin", "main"])
-
+            save_to_google_sheet(df)  # ✅ Save directly to Google Sheets
             st.success(f"✅ {selected_coffee} updated successfully!")
-            train_and_update_model()
             st.rerun()
 
 # 🗑 **Delete Coffee**
@@ -179,21 +112,9 @@ with col3:
 
     if st.button("Delete Coffee"):
         df = df[df["Coffee Name"] != delete_coffee]
-        df.to_csv(DATASET_PATH, index=False, na_rep="None")
-        
-        # ✅ Remove Image from Local Storage and GitHub
-        image_path = os.path.join(IMAGE_FOLDER, f"{delete_coffee.replace(' ', '_')}.png")
-        if os.path.exists(image_path):
-            os.remove(image_path)
-            subprocess.run(["git", "rm", "--ignore-unmatch", image_path])
-
-        # ✅ Push changes to GitHub
-        subprocess.run(["git", "add", DATASET_PATH])
-        subprocess.run(["git", "commit", "-m", f"Deleted coffee: {delete_coffee}"])
-        subprocess.run(["git", "push", "origin", "main"])
+        save_to_google_sheet(df)  # ✅ Save directly to Google Sheets
 
         st.success(f"🗑 {delete_coffee} deleted successfully!")
-        train_and_update_model()
         st.rerun()
 
 st.divider()
