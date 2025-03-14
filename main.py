@@ -16,7 +16,7 @@ st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recomme
 # ✅ Google Sheets Setup
 SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
 SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-CREDS_FILE = "civic-pulsar-453709-f7-10c1906e9ce5.json"
+CREDS_FILE = "civic-pulsar-453709-f7-10c1906e9ce5.json"  # Ensure this file exists
 
 # ✅ Authenticate Google Sheets
 creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
@@ -26,26 +26,8 @@ sheet = client.open_by_key(SHEET_ID).sheet1
 # ✅ Google Drive Setup (For Image Retrieval)
 FOLDER_ID = "1GtQVlpBSe71mvDk5fbkICqMdUuyfyGGn"
 
-def get_drive_service():
-    """Authenticate Google Drive API using a service account."""
-    return build("drive", "v3", credentials=creds)
-
-drive_service = get_drive_service()
-
-def get_image_url_from_drive(coffee_name):
-    """Search for a matching image in Google Drive and return a direct link."""
-    coffee_name_formatted = coffee_name.lower().replace(" ", "_")
-
-    # 🔹 Search for files in the folder
-    query = f"'{FOLDER_ID}' in parents and trashed=false"
-    results = drive_service.files().list(q=query, fields="files(id, name)").execute()
-    files = results.get("files", [])
-
-    for file in files:
-        if coffee_name_formatted in file["name"].lower():
-            return f"https://drive.google.com/uc?id={file['id']}"
-
-    return None  # No matching image found
+# Authenticate with Google Drive API
+drive_service = build("drive", "v3", credentials=creds)
 
 def load_google_sheet():
     """Load coffee data from Google Sheets."""
@@ -55,7 +37,7 @@ def load_google_sheet():
 df = load_google_sheet()
 
 # ✅ Prepare Dataset
-X = df.drop(columns=['Coffee Name'])
+X = df.drop(columns=['Coffee Name'])  # Remove 'Image' column if exists
 y = df['Coffee Name']
 
 X.fillna("Unknown", inplace=True)
@@ -103,6 +85,22 @@ with col2:
     weather = st.selectbox('🌡 Weather:', ['Hot', 'Cold'])
 
 st.divider()  
+
+# ✅ Retrieve Image from Google Drive
+def get_image_url_from_drive(coffee_name):
+    """Search for a matching image in Google Drive and return a direct link."""
+    query = f"'{FOLDER_ID}' in parents and trashed=false"
+    results = drive_service.files().list(q=query, fields="files(id, name)").execute()
+    files = results.get("files", [])
+
+    coffee_name_formatted = coffee_name.lower().replace(" ", "_")
+
+    for file in files:
+        file_name = file['name'].lower()
+        if coffee_name_formatted in file_name:  # Match file name with coffee name
+            return f"https://drive.google.com/uc?id={file['id']}"
+
+    return None  # No matching image found
 
 # 🌟 **Recommendation Section**
 st.markdown("### ☕ AI Coffee Recommendation")
@@ -157,6 +155,7 @@ st.divider()
 # ✅ Admin Button
 if st.button("🔑 Admin Login"):
     st.switch_page("pages/admin.py")
+
 
 
 
