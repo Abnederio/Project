@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "civic-pulsar-453709-f7",
+  "private_key_id": "0132ae4916633cbf76f31b24992785f0e9d7fec0",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCxyWWbqLa8yZ15\ndLA88FnQuO2xjY7sOoCCAPtWMD7/wZHTT/rsp3OQKbAfy5ZaPfocmoJHpeRawPbs\n8J2mC8i5HHsTqI4EMSDbr8rdRoEK7XLDMdx8pqHrE1SlV0VKmrz/Bw42eFJOZbhI\nhQmvOZ5LkIcpbie5mddRfB+uAQXLLAHDYdwZ/BphIWD7OnkuYuQVXz1KMyg1z6ss\n4TlMJENEVGgomCu5C34M2LSvRaykrenICG2KW1vSRekflc9bl5V/rNC2OfpjBp5u\nG5HRXVOf4iBY+SDzk0f4FHke1EAGzGe0MJJx/2n0AS+Z6QWFR6xBbbHvTRJBwKLj\nVJTCj4vHAgMBAAECggEAAiX3dGYN43pjyOq0tHp5KDb8Vn2BRwd0TsaUmEBX72O/\n+D+URc+IfuFcBNn5f0U1RVWbW+xPopATydYNlrdyIX86xgxbYh2dUK6jn6ejpKtr\nDC9qMdkqKshYqtmn1GgIDqZfvJPTDk0hHzr4zQg0UE7OMSEytMAApnvb1fWLLIuY\nu64299RSWGvklKpWFKbwXH3wZX3BavsVz8tkyZccSeoGMWiJFOSQmLx4WOoml54A\nOk0xZ5PUYfUUfdgACjQ8/Itk4LQ6xf2/VktuWqCexTA8QKX9Q5poGJcC0rWjgWVU\nTwwOpdSr0cd3Wx5AwrTXyoplTYpOYZ7FA6FzHJWDQQKBgQDnd0vxMRELQKhviza5\nICgWG17C6Ft4zOldG4tHw6qNj5/vanQ79k4HLo1fd++Y6PN4GU4v3QOq77/+Mlam\ndlYdNHEaDddQtbRULkX2TsowdkYRV2UVZA9vD9MU2gTCpL2/IVrbBjAlMt0kEERI\n9I4Ob/Nz7LydVJJJuEct7M3rQQKBgQDEoYq78GvVMaVaF6OHfP/zn/MN+/Smype7\nHChMNW9FsSzeBPgLacBUAClVdsod1ttxS7jQCupLP4097Vtt1N7VJUOSB1sWjh/t\nIEsQyqf2TjXCjsVkBEVBhfGjMJMn+z1PDM1hgi2gqRj7JrvcFjqM4TP/bOb4PoBk\n5s024hfdBwKBgQDYIXnk9kcO9coRlbF8fX1Q3y/F2YeILfZ9/Tk5woff9UuHGCT+\n1IeZhyt1CJ3Obz7gVui+IqbJF2N0LXbhqr/QN2agyGnUMEb5D9g+HOYJCHd2u99k\ncPFEaEdWQhmN0pxm+vNGbunH4k3B3fqVEN4QtxJhnZ2lXxHWCl9Uj7jbwQKBgBgi\na9DdlZ65VT5VoHDE2vWgMEkLH+BJBY6lyhxwgpPfR06I9ZkRBdZJnskqp2w6Lv0c\n+jYu4MsTpdZwB8TXV/J5fG20EW4XS7vjNtN8zFjjCJ40v+2iyI1eT2ZkU+uYXtIR\nFDRfshICL1rESlKdN9qK2cMELuVRZpj76zxNS/iJAoGAV3XW+Mn8Gs2iJr5dWX6t\n8LKX2V8XqpsoY1PJavC/hVnjp+QPxJSL2NpSkUbCmOMI5mGiMid2RTLxdLqSe7oY\n82MemgB73IHEsJkp96BWF6UEzT704iCLiWpYmv89pW4eNNfL7KhwQyAHEn/xV/Ri\nT2zUGG2r4lEhQGwFcZNf3pg=\n-----END PRIVATE KEY-----\n",
+  "client_email": "streamlit-coffee-api@civic-pulsar-453709-f7.iam.gserviceaccount.com",
+  "client_id": "114539054213104700541",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/streamlit-coffee-api%40civic-pulsar-453709-f7.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
