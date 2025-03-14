@@ -195,6 +195,8 @@ with col2:
                 with open(image_path, "wb") as f:
                     f.write(image_file.getbuffer())
                 image_link = upload_image_to_drive(image_path, image_path)
+                
+                # Update the image link in the DataFrame
                 df.loc[df["Coffee Name"] == selected_coffee, "Image"] = image_link
                 st.success("📸 Image updated successfully!")
 
