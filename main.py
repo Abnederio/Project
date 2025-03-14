@@ -17,7 +17,7 @@ st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recomme
 # ✅ Google Sheets Setup
 SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
 SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-CREDS_FILE = "civic-pulsar-453709-f7-0132ae491663.json"
+CREDS_FILE = "civic-pulsar-453709-f7-0132ae491663.json"  # Ensure this file is available in your project folder
 
 # ✅ Authenticate Google Sheets
 creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
@@ -25,35 +25,25 @@ client = gspread.authorize(creds)
 sheet = client.open_by_key(SHEET_ID).sheet1
 
 # ✅ Google Drive Setup (For Image Retrieval)
-FOLDER_ID = "1GtQVlpBSe71mvDk5fbkICqMdUuyfyGGn"  
+FOLDER_ID = "1GtQVlpBSe71mvDk5fbkICqMdUuyfyGGn"
 
 def authenticate_drive():
+    """Authenticate and connect to Google Drive."""
     gauth = GoogleAuth()
     gauth.LocalWebserverAuth()
     return GoogleDrive(gauth)
 
-# ✅ Load Data from Google Sheets
+drive = authenticate_drive()
+
 def load_google_sheet():
+    """Load coffee data from Google Sheets."""
     data = sheet.get_all_records()
     return pd.DataFrame(data)
-
-# ✅ Convert Google Drive Links into Direct Image Format
-def format_drive_image_link(url):
-    if "drive.google.com" in url:
-        if "file/d/" in url:
-            image_id = url.split("/d/")[1].split("/")[0]  # Extract Google Drive file ID
-        elif "id=" in url:
-            image_id = url.split("id=")[1]  # Extract ID from 'id=' format
-        else:
-            return url  # Return unchanged if format is unknown
-
-        return f"https://drive.google.com/uc?id={image_id}"
-    return url  # Return as is if not a Google Drive link
 
 df = load_google_sheet()
 
 # ✅ Prepare Dataset
-X = df.drop(columns=['Coffee Name'])  # Remove 'Image' since it's not a feature
+X = df.drop(columns=['Coffee Name'])  # Remove 'Image' column if it exists in future
 y = df['Coffee Name']
 
 X.fillna("Unknown", inplace=True)
@@ -102,6 +92,21 @@ with col2:
 
 st.divider()  
 
+# ✅ Retrieve Image from Google Drive
+def get_image_url_from_drive(coffee_name):
+    """Search for a matching image in Google Drive and return a direct link."""
+    file_list = drive.ListFile({'q': f"'{FOLDER_ID}' in parents and trashed=false"}).GetList()
+
+    coffee_name_formatted = coffee_name.lower().replace(" ", "_")
+
+    for file in file_list:
+        file_name = file['title'].lower()
+
+        if file_name.startswith(coffee_name_formatted):
+            return f"https://drive.google.com/uc?id={file['id']}"
+
+    return None  # No matching image found
+
 # 🌟 **Recommendation Section**
 st.markdown("### ☕ AI Coffee Recommendation")
 
@@ -124,27 +129,23 @@ if st.button("🎯 Recommend Coffee"):
     rfr_input_data = [[caffeine_level, sweetness, drink_type, roast_level, milk_type, flavor_notes, bitterness_level, weather]]
     rfr_prediction = model.predict(rfr_input_data)
     
-    # ✅ Fix: Remove [''] from output
     recommended_coffee = rfr_prediction[0] if isinstance(rfr_prediction, (list, np.ndarray)) else rfr_prediction  
     recommended_coffee = str(recommended_coffee).strip("[]'")  
 
     st.success(f"☕ **Your ideal coffee is: {recommended_coffee}**")
 
-    # ✅ Retrieve Image from Google Drive (Using Stored Links)
-    coffee_row = df[df["Coffee Name"] == recommended_coffee]
-    image_link = coffee_row["Image"].values[0] if not coffee_row.empty else None
+    # ✅ Get Image from Google Drive
+    image_link = get_image_url_from_drive(recommended_coffee)
 
     if image_link:
-        # ✅ Convert standard Google Drive link to direct image link
-        direct_image_link = format_drive_image_link(image_link)
-        st.image(direct_image_link, caption=f"Your coffee: {recommended_coffee}")
+        st.image(image_link, caption=f"Your coffee: {recommended_coffee}")
     else:
         st.warning("⚠️ No image available for this coffee.")
 
     # ✅ Gemini AI Explanation
-    genai.configure(api_key="AIzaSyAXpLVdg1s1dpRj0-Crb7HYhr2xHvGUffg")
-    model = genai.GenerativeModel("gemini-2.0-flash")
-    response = model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features}. Explain to the end-user why it is the ideal coffee for them in only 5 sentences.")
+    genai.configure(api_key="YOUR_GEMINI_API_KEY")
+    ai_model = genai.GenerativeModel("gemini-2.0-flash")
+    response = ai_model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features}. Explain in 5 sentences.")
     
     explanation = response.text
 
@@ -159,6 +160,7 @@ st.divider()
 # ✅ Admin Button
 if st.button("🔑 Admin Login"):
     st.switch_page("pages/admin.py")
+
 
 
 
