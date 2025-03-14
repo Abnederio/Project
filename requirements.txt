@@ -17,6 +17,7 @@ google-generativeai
 gunicorn
 oauth2client
 gspread
+pyrive
 
 # Database (Only if using PostgreSQL)
 flask-sqlalchemy
