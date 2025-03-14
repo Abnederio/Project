@@ -22,7 +22,10 @@ st.markdown(
     .stApp {
         background-color: #A27B5C; 
     }
+
+
     </style>
+     <img src="Header.png">
     """,
     unsafe_allow_html=True
 )
