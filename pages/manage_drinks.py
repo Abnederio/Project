@@ -65,14 +65,18 @@ def save_to_google_sheet(df):
             df = df.drop(columns=['Image'])
 
         # Debugging: Print out the data being written to Google Sheets
-        st.write("Data to be written to Google Sheets:", df.head())
+        st.write("Data to be written to Google Sheets:", df.head())  # Debugging the DataFrame
 
-        # If there is new data to be added, append only the new rows
+        # Fetch existing data from the Google Sheet
         existing_data = sheet.get_all_records()
         df_existing = pd.DataFrame(existing_data)
 
+        st.write("Existing Data in Google Sheets:", df_existing.head())  # Debugging existing sheet data
+
+        # If there is new data to be added, append only the new rows
         if len(df) > len(df_existing):  # Check if there is new data
             new_rows = df.iloc[len(df_existing):].values.tolist()
+            st.write("New Rows to be appended:", new_rows)  # Debugging the new rows
             sheet.append_rows(new_rows)  # Append only new rows
             st.success("New rows appended to Google Sheets!")
         else:
@@ -156,7 +160,7 @@ with col1:
                 st.error("⚠️ Coffee already exists!")
             else:
                 image_path = f"{name}.png"  # Use the coffee name for the image path
-                image_link = ""
+                image_link = f"{name}.png"
 
                 if image_file:
                     with open(image_path, "wb") as f:
@@ -175,7 +179,6 @@ with col1:
                     "Flavor Notes": flavor_notes,
                     "Bitterness Level": bitterness_level,
                     "Weather": weather,
-                    "Image": image_link
                 }] * 10)
 
                 # Debugging: Check the new coffee entry before adding it to df
