@@ -164,6 +164,7 @@ with col1:
                     image_link = upload_image_to_drive(image_path, image_path)
                     st.success("📸 Image uploaded successfully!")
 
+                # Create the new coffee entry
                 new_entry = pd.DataFrame([{
                     "Coffee Name": name,
                     "Caffeine Level": caffeine_level,
@@ -177,13 +178,21 @@ with col1:
                     "Image": image_link
                 }] * 10)
 
-                df = pd.concat([new_entry, df], ignore_index=True)
-                df = df.sample(frac=1).reset_index(drop=True)
-                save_to_google_sheet(df)
+                # Debugging: Check the new coffee entry before adding it to df
+                st.write("New Coffee Entry to be Added:", new_entry.head())  # Debugging new entry
 
-                train_and_update_model()
-                st.success(f"☕ {name} added successfully!")
-                st.rerun()
+                # Add new coffee entry to df
+                df = pd.concat([new_entry, df], ignore_index=True)
+
+        # Debugging: Check df after concatenating the new coffee
+        st.write("Updated DataFrame After Adding New Coffee:", df.head())  # Debugging after update
+
+        # Save to Google Sheets
+        save_to_google_sheet(df)
+
+        train_and_update_model()
+        st.success(f"☕ {name} added successfully!")
+        st.rerun()
 
 # ✏️ **Update Coffee** in col2
 with col2:
