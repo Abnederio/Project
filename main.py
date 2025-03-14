@@ -22,9 +22,15 @@ st.markdown(
     .stApp {
         background-color: #A27B5C; 
     }
-
+    .header {
+        display: flex;
+        justify-content: center;
+    }
 
     </style>
+      <div class="header">
+        <img src="Header.png" style="width: 100%; max-width: 900px;">
+    </div>
     """,
     unsafe_allow_html=True
 )
@@ -80,8 +86,8 @@ else:
 
 st.markdown(f"**✅ Model Accuracy:** `{accuracy:.2%}`")
 
+st.image("Header.png", width=800)
 st.header("☕ Alex's Coffee Haven: AI Coffee Recommender")
-st.image("Header.png")
 st.divider()
 
 # ✅ Retrieve Image from Google Drive
