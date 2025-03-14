@@ -37,6 +37,19 @@ def load_google_sheet():
     data = sheet.get_all_records()
     return pd.DataFrame(data)
 
+# ✅ Convert Google Drive Links into Direct Image Format
+def format_drive_image_link(url):
+    if "drive.google.com" in url:
+        if "file/d/" in url:
+            image_id = url.split("/d/")[1].split("/")[0]  # Extract Google Drive file ID
+        elif "id=" in url:
+            image_id = url.split("id=")[1]  # Extract ID from 'id=' format
+        else:
+            return url  # Return unchanged if format is unknown
+
+        return f"https://drive.google.com/uc?id={image_id}"
+    return url  # Return as is if not a Google Drive link
+
 df = load_google_sheet()
 
 # ✅ Prepare Dataset
@@ -122,7 +135,9 @@ if st.button("🎯 Recommend Coffee"):
     image_link = coffee_row["Image"].values[0] if not coffee_row.empty else None
 
     if image_link:
-        st.image(image_link, caption=f"Your coffee: {recommended_coffee}")
+        # ✅ Convert standard Google Drive link to direct image link
+        direct_image_link = format_drive_image_link(image_link)
+        st.image(direct_image_link, caption=f"Your coffee: {recommended_coffee}")
     else:
         st.warning("⚠️ No image available for this coffee.")
 
