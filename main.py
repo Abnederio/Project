@@ -6,8 +6,7 @@ import numpy as np
 import google.generativeai as genai
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
+from googleapiclient.discovery import build
 from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
@@ -17,7 +16,7 @@ st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recomme
 # ✅ Google Sheets Setup
 SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
 SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-CREDS_FILE = "civic-pulsar-453709-f7-10c1906e9ce5.json"  # Ensure this file is available in your project folder
+CREDS_FILE = "civic-pulsar-453709-f7-10c1906e9ce5.json"
 
 # ✅ Authenticate Google Sheets
 creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
@@ -27,13 +26,26 @@ sheet = client.open_by_key(SHEET_ID).sheet1
 # ✅ Google Drive Setup (For Image Retrieval)
 FOLDER_ID = "1GtQVlpBSe71mvDk5fbkICqMdUuyfyGGn"
 
-def authenticate_drive():
-    """Authenticate and connect to Google Drive."""
-    gauth = GoogleAuth()
-    gauth.LocalWebserverAuth()
-    return GoogleDrive(gauth)
+def get_drive_service():
+    """Authenticate Google Drive API using a service account."""
+    return build("drive", "v3", credentials=creds)
 
-drive = authenticate_drive()
+drive_service = get_drive_service()
+
+def get_image_url_from_drive(coffee_name):
+    """Search for a matching image in Google Drive and return a direct link."""
+    coffee_name_formatted = coffee_name.lower().replace(" ", "_")
+
+    # 🔹 Search for files in the folder
+    query = f"'{FOLDER_ID}' in parents and trashed=false"
+    results = drive_service.files().list(q=query, fields="files(id, name)").execute()
+    files = results.get("files", [])
+
+    for file in files:
+        if coffee_name_formatted in file["name"].lower():
+            return f"https://drive.google.com/uc?id={file['id']}"
+
+    return None  # No matching image found
 
 def load_google_sheet():
     """Load coffee data from Google Sheets."""
@@ -43,7 +55,7 @@ def load_google_sheet():
 df = load_google_sheet()
 
 # ✅ Prepare Dataset
-X = df.drop(columns=['Coffee Name'])  # Remove 'Image' column if it exists in future
+X = df.drop(columns=['Coffee Name'])
 y = df['Coffee Name']
 
 X.fillna("Unknown", inplace=True)
@@ -91,21 +103,6 @@ with col2:
     weather = st.selectbox('🌡 Weather:', ['Hot', 'Cold'])
 
 st.divider()  
-
-# ✅ Retrieve Image from Google Drive
-def get_image_url_from_drive(coffee_name):
-    """Search for a matching image in Google Drive and return a direct link."""
-    file_list = drive.ListFile({'q': f"'{FOLDER_ID}' in parents and trashed=false"}).GetList()
-
-    coffee_name_formatted = coffee_name.lower().replace(" ", "_")
-
-    for file in file_list:
-        file_name = file['title'].lower()
-
-        if file_name.startswith(coffee_name_formatted):
-            return f"https://drive.google.com/uc?id={file['id']}"
-
-    return None  # No matching image found
 
 # 🌟 **Recommendation Section**
 st.markdown("### ☕ AI Coffee Recommendation")
@@ -160,6 +157,7 @@ st.divider()
 # ✅ Admin Button
 if st.button("🔑 Admin Login"):
     st.switch_page("pages/admin.py")
+
 
 
 
