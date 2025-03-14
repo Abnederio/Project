@@ -22,15 +22,8 @@ st.markdown(
     .stApp {
         background-color: #A27B5C; 
     }
-    .header {
-        display: flex;
-        justify-content: center;
-    }
 
     </style>
-      <div class="header">
-        <img src="Header.png" style="width: 100%; max-width: 900px;">
-    </div>
     """,
     unsafe_allow_html=True
 )
