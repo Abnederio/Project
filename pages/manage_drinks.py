@@ -76,8 +76,12 @@ def save_to_google_sheet(df):
         # If there is new data to be added, append only the new rows
         if len(df) > len(df_existing):  # Check if there is new data
             new_rows = df.iloc[len(df_existing):].values.tolist()
-            st.write("New Rows to be appended:", new_rows)  # Debugging the new rows
-            sheet.append_rows(new_rows)  # Append only new rows
+
+            # Debugging: Print new rows to be appended
+            st.write("New Rows to be appended:", new_rows)  # Debugging new rows
+
+            # Append new rows to Google Sheets, using proper headers
+            sheet.append_rows(new_rows, value_input_option='RAW')  # Using 'RAW' to avoid any special formatting issues
             st.success("New rows appended to Google Sheets!")
         else:
             # If updating, update the entire sheet
