@@ -16,7 +16,7 @@ st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recomme
 # ✅ Google Sheets Setup
 SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
 SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-CREDS_FILE = "civic-pulsar-453709-f7-10c1906e9ce5.json"  # Ensure this file exists
+CREDS_FILE = "civic-pulsar-453709-f7-10c1906e9ce5.json"  # Ensure this file is in the project directory
 
 # ✅ Authenticate Google Sheets
 creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
@@ -36,8 +36,8 @@ def load_google_sheet():
 
 df = load_google_sheet()
 
-# ✅ Prepare Dataset
-X = df.drop(columns=['Coffee Name'])  # Remove 'Image' column if exists
+# ✅ Prepare Dataset for Model
+X = df.drop(columns=['Coffee Name'])
 y = df['Coffee Name']
 
 X.fillna("Unknown", inplace=True)
@@ -66,6 +66,23 @@ st.markdown(f"**✅ Model Accuracy:** `{accuracy:.2%}`")
 st.header("☕ Alex's Coffee Haven: AI Coffee Recommender")
 st.divider()
 
+# ✅ Retrieve Image from Google Drive
+def get_image_url_from_drive(coffee_name):
+    """Search for a matching image in Google Drive and return a direct link."""
+    query = f"'{FOLDER_ID}' in parents and trashed=false"
+    results = drive_service.files().list(q=query, fields="files(id, name)").execute()
+    files = results.get("files", [])
+
+    coffee_name_formatted = coffee_name.lower().replace(" ", "").replace("_", "")
+
+    for file in files:
+        file_name = file['name'].lower().replace(" ", "").replace("_", "")
+
+        if file_name.startswith(coffee_name_formatted) and file_name.endswith(('.png', '.jpg', '.jpeg')):
+            return f"https://drive.google.com/uc?id={file['id']}"
+
+    return None  # No matching image found
+
 # 🎯 **User Input Section**
 st.markdown("#### ☕ Select Your Preferences")
 
@@ -85,22 +102,6 @@ with col2:
     weather = st.selectbox('🌡 Weather:', ['Hot', 'Cold'])
 
 st.divider()  
-
-# ✅ Retrieve Image from Google Drive
-def get_image_url_from_drive(coffee_name):
-    """Search for a matching image in Google Drive and return a direct link."""
-    query = f"'{FOLDER_ID}' in parents and trashed=false"
-    results = drive_service.files().list(q=query, fields="files(id, name)").execute()
-    files = results.get("files", [])
-
-    coffee_name_formatted = coffee_name.lower().replace(" ", "_")
-
-    for file in files:
-        file_name = file['name'].lower()
-        if coffee_name_formatted in file_name:  # Match file name with coffee name
-            return f"https://drive.google.com/uc?id={file['id']}"
-
-    return None  # No matching image found
 
 # 🌟 **Recommendation Section**
 st.markdown("### ☕ AI Coffee Recommendation")
@@ -155,6 +156,7 @@ st.divider()
 # ✅ Admin Button
 if st.button("🔑 Admin Login"):
     st.switch_page("pages/admin.py")
+
 
 
 
