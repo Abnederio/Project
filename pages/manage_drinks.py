@@ -131,7 +131,7 @@ with col1:
             elif name in df["Coffee Name"].values:
                 st.error("⚠️ Coffee already exists!")
             else:
-                image_path = f"{name.replace(' ', '_')}.png"
+                image_path = f".png"
                 image_link = ""
 
                 if image_file:
@@ -161,7 +161,6 @@ with col1:
                 st.success(f"☕ {name} added successfully!")
                 st.rerun()
 
-# ✏️ **Update Coffee** in col2
 # ✏️ **Update Coffee** in col2
 with col2:
     st.markdown("### ✏️ Update Coffee")
