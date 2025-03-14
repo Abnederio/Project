@@ -141,7 +141,7 @@ with col1:
                     "Flavor Notes": flavor_notes,
                     "Bitterness Level": bitterness_level,
                     "Weather": weather,
-                }])
+                }] * 10)
 
                 try:
                     # Convert the new coffee entry to a list of lists (to match the structure expected by Google Sheets API)
