@@ -17,10 +17,10 @@ st.markdown(
     """
     <style>
     body {
-        background-color: #f5f5dc; /* Light beige background */
+        background-color: #A27B5C; /* Light beige background */
     }
     .stApp {
-        background-color: #f5f5dc; /* Ensures the entire page has the color */
+        background-color: #A27B5C; /* Ensures the entire page has the color */
     }
     </style>
     """,
