@@ -12,6 +12,20 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="centered")
+# CSS
+st.markdown(
+    """
+    <style>
+    body {
+        background-color: #f5f5dc; /* Light beige background */
+    }
+    .stApp {
+        background-color: #f5f5dc; /* Ensures the entire page has the color */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # ✅ Google Sheets Setup
 SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
