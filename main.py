@@ -25,7 +25,6 @@ st.markdown(
 
 
     </style>
-     <img src="Header.png">
     """,
     unsafe_allow_html=True
 )
