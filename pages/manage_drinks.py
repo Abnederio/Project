@@ -191,7 +191,7 @@ with col2:
 
             # Handle image update
             if image_file:
-                image_path = f"{new_name.replace(' ', '_')}.png"
+                image_path = f"{new_name}.png"  # Use the name directly, without replacing spaces with underscores
                 with open(image_path, "wb") as f:
                     f.write(image_file.getbuffer())
                 image_link = upload_image_to_drive(image_path, image_path)
