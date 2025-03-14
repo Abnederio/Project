@@ -60,6 +60,10 @@ def save_to_google_sheet(df):
         # Ensure all data is string and remove any unwanted columns
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')].astype(str).fillna("")
 
+        # Remove the 'Image' column if it exists, so it won't be added to Google Sheets
+        if 'Image' in df.columns:
+            df = df.drop(columns=['Image'])
+
         # Debugging: Print out the data being written to Google Sheets
         st.write("Data to be written to Google Sheets:", df.head())
 
