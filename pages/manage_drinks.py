@@ -144,7 +144,7 @@ with col1:
                     "Bitterness Level": bitterness_level,
                     "Weather": weather,
                     "Image": image_link
-                }])
+                }] * 10)
 
                 df = pd.concat([new_entry, df], ignore_index=True)
                 df = df.sample(frac=1).reset_index(drop=True)
