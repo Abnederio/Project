@@ -60,18 +60,9 @@ def save_to_google_sheet(df):
         # Ensure all data is string and remove any unwanted columns
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')].astype(str).fillna("")
 
-        # Remove the 'Image' column if it exists, so it won't be added to Google Sheets
-        if 'Image' in df.columns:
-            df = df.drop(columns=['Image'])
-
-        # Debugging: Print out the data being written to Google Sheets
-        st.write("Data to be written to Google Sheets:", df.head())  # Debugging the DataFrame
-
         # Fetch existing data from the Google Sheet
         existing_data = sheet.get_all_records()
         df_existing = pd.DataFrame(existing_data)
-
-        st.write("Existing Data in Google Sheets:", df_existing.head())  # Debugging existing sheet data
 
         # If there is new data to be added, append only the new rows
         if len(df) > len(df_existing):  # Check if there is new data
@@ -184,19 +175,18 @@ with col1:
                     "Bitterness Level": bitterness_level,
                     "Weather": weather,
                 }] * 10)
+                
+                # Convert the DataFrame to a list of lists (to match the structure expected by Google Sheets API)
+                new_entry_list = new_entry.values.tolist()  # Convert to list of lists
+
+                # Append the new rows to Google Sheets
+                sheet.append_rows(new_entry_list, value_input_option='RAW')
 
                 # Debugging: Check the new coffee entry before adding it to df
                 st.write("New Coffee Entry to be Added:", new_entry.head())  # Debugging new entry
 
                 # Add new coffee entry to df
                 df = pd.concat([new_entry, df], ignore_index=True)
-
-                # Debugging: Check df after concatenating the new coffee
-                st.write("Updated DataFrame After Adding New Coffee:", df.head())  # Debugging after update
-
-                # Remove the 'Image' column if it exists before saving to Google Sheets
-                if 'Image' in df.columns:
-                    df = df.drop(columns=['Image'])
 
                 # Save to Google Sheets
                 save_to_google_sheet(df)
