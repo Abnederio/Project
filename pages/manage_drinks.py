@@ -27,8 +27,9 @@ sheet = client.open_by_key(SHEET_ID).sheet1  # Access the first sheet
 FOLDER_ID = "1GtQVlpBSe71mvDk5fbkICqMdUuyfyGGn"  # Your Google Drive Folder ID
 
 def authenticate_drive():
+    creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
     gauth = GoogleAuth()
-    gauth.LocalWebserverAuth()  # Opens a browser for authentication
+    gauth.credentials = creds
     return GoogleDrive(gauth)
 
 def upload_image_to_drive(image_path, image_name):
@@ -92,7 +93,7 @@ def image_formatter(url):
 
 # 🔹 Show Dataframe with Images
 st.markdown("### ☕ Current Coffee Menu")
-st.write(df.to_html(escape=False, formatters={"Image": image_formatter}), unsafe_allow_html=True)
+st.dataframe(df, height=500)
 
 st.divider()
 
