@@ -59,11 +59,20 @@ def save_to_google_sheet(df):
     # Remove unwanted columns and ensure all data is string
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')].astype(str).fillna("")
     
-    # Update Google Sheet in chunks
-    chunk_size = 1000  # Avoid exceeding API limits
-    for i in range(0, len(df), chunk_size):
-        chunk = df.iloc[i : i + chunk_size]
-        sheet.update([df.columns.values.tolist()] + chunk.values.tolist())
+    # Fetch existing data only once
+    existing_data = sheet.get_all_records()
+    df_existing = pd.DataFrame(existing_data)
+
+    # If new data is larger, append only new rows
+    if len(df) > len(df_existing):
+        new_rows = df.iloc[len(df_existing):].values.tolist()
+        sheet.append_rows(new_rows)  # Append only new rows
+    else:
+        # Update the entire sheet in chunks (avoids API limits)
+        chunk_size = 1000  
+        for i in range(0, len(df), chunk_size):
+            chunk = df.iloc[i : i + chunk_size]
+            sheet.update([df.columns.values.tolist()] + chunk.values.tolist())
 
 # 🔹 Train & Update Model
 def train_and_update_model():
