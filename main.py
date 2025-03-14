@@ -134,12 +134,13 @@ if st.button("🎯 Recommend Coffee"):
     image_link = get_image_url_from_drive(recommended_coffee)
 
     if image_link:
+        print(image_link)
         st.image(image_link, caption=f"Your coffee: {recommended_coffee}")
     else:
         st.warning("⚠️ No image available for this coffee.")
 
     # ✅ Gemini AI Explanation
-    genai.configure(api_key="AIzaSyAXpLVdg1s1dpRj0-Crb7HYhr2xHvGUffg")
+    genai.configure(api_key="YOUR_GEMINI_API_KEY")
     ai_model = genai.GenerativeModel("gemini-2.0-flash")
     response = ai_model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features}. Explain in 5 sentences.")
     
