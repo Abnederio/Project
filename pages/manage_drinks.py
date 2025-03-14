@@ -56,8 +56,14 @@ def load_google_sheet():
 
 # 🔹 Save Data to Google Sheets
 def save_to_google_sheet(df):
-    sheet.clear()
-    sheet.update([df.columns.values.tolist()] + df.values.tolist())
+    # Remove unwanted columns and ensure all data is string
+    df = df.loc[:, ~df.columns.str.contains('^Unnamed')].astype(str).fillna("")
+    
+    # Update Google Sheet in chunks
+    chunk_size = 1000  # Avoid exceeding API limits
+    for i in range(0, len(df), chunk_size):
+        chunk = df.iloc[i : i + chunk_size]
+        sheet.update([df.columns.values.tolist()] + chunk.values.tolist())
 
 # 🔹 Train & Update Model
 def train_and_update_model():
