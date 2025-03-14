@@ -106,7 +106,7 @@ st.divider()
 # 🎨 **Columns for Better Layout**
 col1, col2, col3 = st.columns([2, 2, 1])
 
-# ➕ **Add Coffee**
+# ➕ **Add Coffee** in col1
 with col1:
     with st.form("add_coffee"):
         st.markdown("### ➕ Add New Coffee")
@@ -161,36 +161,49 @@ with col1:
                 st.success(f"☕ {name} added successfully!")
                 st.rerun()
 
-# ✏️ **Update Coffee**
-st.markdown("### ✏️ Update Coffee")
-coffee_names = df["Coffee Name"].dropna().unique()
-selected_coffee = st.selectbox("Select coffee to update:", coffee_names)
+# ✏️ **Update Coffee** in col2
+# ✏️ **Update Coffee** in col2
+with col2:
+    st.markdown("### ✏️ Update Coffee")
+    coffee_names = df["Coffee Name"].dropna().unique()
+    selected_coffee = st.selectbox("Select coffee to update:", coffee_names)
 
-if selected_coffee:
-    coffee_data = df[df["Coffee Name"] == selected_coffee].iloc[0]
+    if selected_coffee:
+        coffee_data = df[df["Coffee Name"] == selected_coffee].iloc[0]
 
-    new_caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Caffeine Level"]))
-    new_sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Sweetness"]))
-    new_drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'], index=['Frozen', 'Iced', 'Hot'].index(coffee_data["Type"]))
+        # Get the current values for all features
+        new_name = st.text_input("Coffee Name", value=coffee_data["Coffee Name"])
+        new_caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Caffeine Level"]))
+        new_sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Sweetness"]))
+        new_drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'], index=['Frozen', 'Iced', 'Hot'].index(coffee_data["Type"]))
+        new_roast_level = st.selectbox('Roast Level:', ['Medium', 'None', 'Dark'], index=['Medium', 'None', 'Dark'].index(coffee_data["Roast Level"]))
+        new_milk_type = 'Dairy' if coffee_data["Milk Type"] == "Dairy" else 'No Dairy'
+        new_flavor_notes = st.selectbox('Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'], index=['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'].index(coffee_data["Flavor Notes"]))
+        new_bitterness_level = st.selectbox('Bitterness Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Bitterness Level"]))
+        new_weather = st.selectbox('Weather:', ['Hot', 'Cold'], index=['Hot', 'Cold'].index(coffee_data["Weather"]))
 
-    if st.button("Update Coffee"):
-        df.loc[df["Coffee Name"] == selected_coffee, ["Caffeine Level", "Sweetness", "Type"]] = [new_caffeine_level, new_sweetness, new_drink_type]
-        
+        # Upload new image if provided
         image_file = st.file_uploader("Upload a new image for the coffee", type=['jpg', 'jpeg', 'png'])
 
-        if image_file:
-            image_path = f"{selected_coffee.replace(' ', '_')}.png"
-            with open(image_path, "wb") as f:
-                f.write(image_file.getbuffer())
-            image_link = upload_image_to_drive(image_path, image_path)
-            df.loc[df["Coffee Name"] == selected_coffee, "Image"] = image_link
-            st.success("📸 Image updated successfully!")
+        if st.button("Update Coffee"):
+            # Update the coffee in the DataFrame
+            df.loc[df["Coffee Name"] == selected_coffee, ["Coffee Name", "Caffeine Level", "Sweetness", "Type", "Roast Level", "Milk Type", "Flavor Notes", "Bitterness Level", "Weather"]] = [new_name, new_caffeine_level, new_sweetness, new_drink_type, new_roast_level, new_milk_type, new_flavor_notes, new_bitterness_level, new_weather]
 
-        save_to_google_sheet(df)
-        st.success(f"✅ {selected_coffee} updated successfully!")
-        st.rerun()
+            # Handle image update
+            if image_file:
+                image_path = f"{new_name.replace(' ', '_')}.png"
+                with open(image_path, "wb") as f:
+                    f.write(image_file.getbuffer())
+                image_link = upload_image_to_drive(image_path, image_path)
+                df.loc[df["Coffee Name"] == selected_coffee, "Image"] = image_link
+                st.success("📸 Image updated successfully!")
 
-# 🗑 **Delete Coffee**
+            # Save the updated data to Google Sheets
+            save_to_google_sheet(df)
+            st.success(f"✅ {new_name} updated successfully!")
+            st.rerun()
+
+# 🗑 **Delete Coffee** in col3
 with col3:
     st.markdown("### 🗑 Delete Coffee")
     delete_coffee = st.selectbox("Select coffee to delete:", df["Coffee Name"].dropna().unique())
@@ -211,6 +224,7 @@ if st.button("🏠 Go Back to Menu"):
 if st.button("🚪 Logout"):
     st.session_state.token = None
     st.switch_page("pages/admin.py")
+
 
 
 
