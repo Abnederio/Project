@@ -68,7 +68,6 @@ st.divider()
 
 # ✅ Retrieve Image from Google Drive
 def get_image_url_from_drive(coffee_name):
-    """Search for a matching image in Google Drive and return a direct link."""
     query = f"'{FOLDER_ID}' in parents and trashed=false"
     results = drive_service.files().list(q=query, fields="files(id, name)").execute()
     files = results.get("files", [])
@@ -77,11 +76,10 @@ def get_image_url_from_drive(coffee_name):
 
     for file in files:
         file_name = file['name'].lower().replace(" ", "").replace("_", "")
-
         if file_name.startswith(coffee_name_formatted) and file_name.endswith(('.png', '.jpg', '.jpeg')):
-            return f"https://drive.google.com/uc?id={file['id']}"
+            return f"https://drive.google.com/thumbnail?id={file['id']}&sz=w500"  # Resized URL
 
-    return None  # No matching image found
+    return None
 
 # 🎯 **User Input Section**
 st.markdown("#### ☕ Select Your Preferences")
