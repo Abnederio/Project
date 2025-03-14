@@ -15,7 +15,7 @@ st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recomme
 
 # 🔹 Google Sheets Setup
 SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"  # Your Google Sheet ID
-SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+SCOPE = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.file"]
 CREDS_FILE = "civic-pulsar-453709-f7-10c1906e9ce5.json"  # Your Google API credentials
 
 # 🔹 Authenticate Google Sheets
@@ -56,23 +56,34 @@ def load_google_sheet():
 
 # 🔹 Save Data to Google Sheets
 def save_to_google_sheet(df):
-    # Remove unwanted columns and ensure all data is string
-    df = df.loc[:, ~df.columns.str.contains('^Unnamed')].astype(str).fillna("")
-    
-    # Fetch existing data only once
-    existing_data = sheet.get_all_records()
-    df_existing = pd.DataFrame(existing_data)
+    try:
+        # Ensure all data is string and remove any unwanted columns
+        df = df.loc[:, ~df.columns.str.contains('^Unnamed')].astype(str).fillna("")
 
-    # If new data is larger, append only new rows
-    if len(df) > len(df_existing):
-        new_rows = df.iloc[len(df_existing):].values.tolist()
-        sheet.append_rows(new_rows)  # Append only new rows
-    else:
-        # Update the entire sheet in chunks (avoids API limits)
-        chunk_size = 1000  
-        for i in range(0, len(df), chunk_size):
-            chunk = df.iloc[i : i + chunk_size]
-            sheet.update([df.columns.values.tolist()] + chunk.values.tolist())
+        # Debugging: Print out the data being written to Google Sheets
+        st.write("Data to be written to Google Sheets:", df.head())
+
+        # If there is new data to be added, append only the new rows
+        existing_data = sheet.get_all_records()
+        df_existing = pd.DataFrame(existing_data)
+
+        if len(df) > len(df_existing):  # Check if there is new data
+            new_rows = df.iloc[len(df_existing):].values.tolist()
+            sheet.append_rows(new_rows)  # Append only new rows
+            st.success("New rows appended to Google Sheets!")
+        else:
+            # If updating, update the entire sheet
+            chunk_size = 1000  # To avoid exceeding API limits
+            for i in range(0, len(df), chunk_size):
+                chunk = df.iloc[i:i + chunk_size]
+                sheet.update([df.columns.values.tolist()] + chunk.values.tolist())
+            st.success("Google Sheets updated successfully!")
+
+        return True  # Return True if successful
+
+    except Exception as e:
+        st.error(f"Error updating Google Sheets: {e}")
+        return False  # Return False if there was an error
 
 # 🔹 Train & Update Model
 def train_and_update_model():
