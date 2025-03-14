@@ -28,14 +28,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-st.markdown(
-    """
-    <div style="text-align: center;">
-        <img src="Header.png">
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+
 
 # ✅ Google Sheets Setup
 SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
