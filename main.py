@@ -53,7 +53,7 @@ def format_drive_image_link(url):
 df = load_google_sheet()
 
 # ✅ Prepare Dataset
-X = df.drop(columns=['Coffee Name', 'Image'])  # Remove 'Image' since it's not a feature
+X = df.drop(columns=['Coffee Name'])  # Remove 'Image' since it's not a feature
 y = df['Coffee Name']
 
 X.fillna("Unknown", inplace=True)
