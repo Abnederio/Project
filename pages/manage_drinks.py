@@ -54,25 +54,6 @@ def load_google_sheet():
     data = sheet.get_all_records()
     return pd.DataFrame(data)
 
-# 🔹 Save Data to Google Sheets
-def save_to_google_sheet(df):
-    try:
-        # Ensure all data is string and remove any unwanted columns
-        df = df.loc[:, ~df.columns.str.contains('^Unnamed')].astype(str).fillna("")
-
-        # Convert the DataFrame to a list of lists (to match the structure expected by Google Sheets API)
-        new_entry_list = df.values.tolist()  # Convert to list of lists
-
-        # Append new rows to Google Sheets, using proper headers
-        sheet.append_rows(new_entry_list, value_input_option='RAW')
-        st.success("Google Sheets updated successfully!")
-
-        return True  # Return True if successful
-
-    except Exception as e:
-        st.error(f"Error updating Google Sheets: {e}")
-        return False  # Return False if there was an error
-
 # 🔹 Train & Update Model
 def train_and_update_model():
     st.info("🔄 Retraining the model...")
@@ -160,19 +141,20 @@ with col1:
                     "Flavor Notes": flavor_notes,
                     "Bitterness Level": bitterness_level,
                     "Weather": weather,
-                }] * 10)
+                }])
 
-                # Convert the new coffee entry to a list of lists (to match the structure expected by Google Sheets API)
-                new_entry_list = new_entry.values.tolist()
+                try:
+                    # Convert the new coffee entry to a list of lists (to match the structure expected by Google Sheets API)
+                    new_entry_list = new_entry.values.tolist()
+                    # Append only the new rows to Google Sheets
+                    sheet.append_rows(new_entry_list, value_input_option='RAW')
+                    st.success("Google Sheets updated successfully!")
+                    train_and_update_model()
+                    st.success(f"☕ {name} added successfully!")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Error updating Google Sheets: {e}")
 
-                # Append only the new rows to Google Sheets
-                sheet.append_rows(new_entry_list, value_input_option='RAW')
-
-                train_and_update_model()
-                st.success(f"☕ {name} added successfully!")
-                st.rerun()
-
-# ✏️ **Update Coffee** in col2
 # ✏️ **Update Coffee** in col2
 with col2:
     st.markdown("### ✏️ Update Coffee")
@@ -227,17 +209,51 @@ with col2:
             st.rerun()
 
 # 🗑 **Delete Coffee** in col3
+# 🗑 **Delete Coffee** in col3
 with col3:
     st.markdown("### 🗑 Delete Coffee")
     delete_coffee = st.selectbox("Select coffee to delete:", df["Coffee Name"].dropna().unique())
 
     if st.button("Delete Coffee"):
-        df = df[df["Coffee Name"] != delete_coffee]
-        save_to_google_sheet(df)
+        if delete_coffee:
+            # Get the image link for the selected coffee to delete from Google Drive
+            coffee_data = df[df["Coffee Name"] == delete_coffee].iloc[0]
+            image_link = coffee_data["Image"] if "Image" in coffee_data else None
+            if image_link:
+                # Extract the image ID from the link
+                image_id = image_link.split('=')[-1]
+                drive = authenticate_drive()
 
-        train_and_update_model()
-        st.success(f"🗑 {delete_coffee} deleted successfully!")
-        st.rerun()
+                # Delete the image from Google Drive
+                try:
+                    file_drive = drive.CreateFile({'id': image_id})
+                    file_drive.Delete()
+                    st.success(f"🗑 Image for {delete_coffee} deleted successfully from Google Drive!")
+                except Exception as e:
+                    st.error(f"Error deleting image from Google Drive: {e}")
+
+            # Remove the coffee from the DataFrame
+            df = df[df["Coffee Name"] != delete_coffee]
+
+            # Update Google Sheets to reflect the deletion
+            try:
+                existing_data = sheet.get_all_records()
+
+                # Iterate over all rows and delete rows where the coffee name matches
+                for i, row in enumerate(existing_data, start=2):  # starting at 2 because Sheet rows start from 1
+                    if row["Coffee Name"] == delete_coffee:
+                        # Delete the row from Google Sheets
+                        sheet.delete_rows(i)
+                        break  # Exit loop after deleting the row
+
+                st.success(f"🗑 {delete_coffee} deleted successfully from Google Sheets!")
+                train_and_update_model()  # Retrain the model with the updated data
+                st.rerun()
+
+            except Exception as e:
+                st.error(f"Error updating Google Sheets: {e}")
+        else:
+            st.error("❌ Please select a coffee to delete.")
 
 st.divider()
 
