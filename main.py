@@ -17,15 +17,17 @@ st.markdown(
     """
     <style>
     body {
-        background-color: #A27B5C; /* Light beige background */
+        background-color: #A27B5C;
     }
     .stApp {
-        background-color: #A27B5C; /* Ensures the entire page has the color */
+        background-color: #A27B5C; 
     }
+
     </style>
     """,
     unsafe_allow_html=True
 )
+
 
 # ✅ Google Sheets Setup
 SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
@@ -77,6 +79,7 @@ else:
 
 st.markdown(f"**✅ Model Accuracy:** `{accuracy:.2%}`")
 
+st.image("Header.png", width=800)
 st.header("☕ Alex's Coffee Haven: AI Coffee Recommender")
 st.divider()
 
