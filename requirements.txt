@@ -15,6 +15,7 @@ google-generativeai
 
 # Server & Deployment
 gunicorn
+oauth2client
 
 # Database (Only if using PostgreSQL)
 flask-sqlalchemy
