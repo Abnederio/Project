@@ -17,7 +17,7 @@ st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recomme
 # ✅ Google Sheets Setup
 SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
 SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-CREDS_FILE = "civic-pulsar-453709-f7-0132ae491663.json"  # Ensure this file is available in your project folder
+CREDS_FILE = "civic-pulsar-453709-f7-10c1906e9ce5.json"  # Ensure this file is available in your project folder
 
 # ✅ Authenticate Google Sheets
 creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
