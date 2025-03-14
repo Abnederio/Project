@@ -1,4 +1,15 @@
-import pandas as pd
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
-df = pd.read_csv("coffee_dataset.csv")
-print(df['Roast Level'].unique())
+SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
+SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+CREDS_FILE = "civic-pulsar-453709-f7-3e30443dffca.json"
+
+creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
+client = gspread.authorize(creds)
+sheet = client.open_by_key(SHEET_ID).sheet1  
+
+print(sheet.get_all_records()) 
+
+
+
