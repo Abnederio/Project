@@ -155,7 +155,7 @@ with col1:
             elif name in df["Coffee Name"].values:
                 st.error("⚠️ Coffee already exists!")
             else:
-                image_path = f".png"
+                image_path = f"{name}.png"  # Use the coffee name for the image path
                 image_link = ""
 
                 if image_file:
@@ -164,7 +164,7 @@ with col1:
                     image_link = upload_image_to_drive(image_path, image_path)
                     st.success("📸 Image uploaded successfully!")
 
-                # Create the new coffee entry
+                # Create the new coffee entry as a DataFrame
                 new_entry = pd.DataFrame([{
                     "Coffee Name": name,
                     "Caffeine Level": caffeine_level,
@@ -184,15 +184,19 @@ with col1:
                 # Add new coffee entry to df
                 df = pd.concat([new_entry, df], ignore_index=True)
 
-        # Debugging: Check df after concatenating the new coffee
-        st.write("Updated DataFrame After Adding New Coffee:", df.head())  # Debugging after update
+                # Debugging: Check df after concatenating the new coffee
+                st.write("Updated DataFrame After Adding New Coffee:", df.head())  # Debugging after update
 
-        # Save to Google Sheets
-        save_to_google_sheet(df)
+                # Remove the 'Image' column if it exists before saving to Google Sheets
+                if 'Image' in df.columns:
+                    df = df.drop(columns=['Image'])
 
-        train_and_update_model()
-        st.success(f"☕ {name} added successfully!")
-        st.rerun()
+                # Save to Google Sheets
+                save_to_google_sheet(df)
+
+                train_and_update_model()
+                st.success(f"☕ {name} added successfully!")
+                st.rerun()
 
 # ✏️ **Update Coffee** in col2
 with col2:
