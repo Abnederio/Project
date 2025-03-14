@@ -1,48 +1,46 @@
+import streamlit as st
 import pandas as pd
-import catboost
+import os
+import joblib
+import numpy as np
+import google.generativeai as genai
+from oauth2client.service_account import ServiceAccountCredentials
+import gspread
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
 from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-import streamlit as st
-import joblib
-import os
-import numpy as np
-import google.generativeai as genai
-import requests
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="centered")
 
-# ✅ Custom CSS for a sleek UI
-st.markdown("""
-    <style>
-        [data-testid="stSidebar"] { display: none; }  /* Hide Sidebar */
-        div.stButton > button {
-            width: 100%;
-            border-radius: 10px;
-            background-color: #8B4513;  /* Coffee Brown */
-            color: white;
-            font-size: 18px;
-            padding: 10px;
-            transition: all 0.3s ease-in-out;
-        }
-        div.stButton > button:hover {
-            background-color: #5a2e1a;
-            transform: scale(1.05);
-        }
-        div.stAlert {
-            text-align: center;
-            font-size: 18px;
-        }
-        h1, h2, h3 {
-            text-align: center;
-            color: #F28C28;
-        }
-    </style>
-""", unsafe_allow_html=True)
+# ✅ Google Sheets Setup
+SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
+SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+CREDS_FILE = "credentials.json"
 
-# 📥 Load dataset
-df = pd.read_csv("coffee_dataset.csv")
-X = df.drop(columns=['Coffee Name'])
+# ✅ Authenticate Google Sheets
+creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
+client = gspread.authorize(creds)
+sheet = client.open_by_key(SHEET_ID).sheet1
+
+# ✅ Google Drive Setup (For Image Retrieval)
+FOLDER_ID = "1GtQVlpBSe71mvDk5fbkICqMdUuyfyGGn"  
+
+def authenticate_drive():
+    gauth = GoogleAuth()
+    gauth.LocalWebserverAuth()
+    return GoogleDrive(gauth)
+
+# ✅ Load Data from Google Sheets
+def load_google_sheet():
+    data = sheet.get_all_records()
+    return pd.DataFrame(data)
+
+df = load_google_sheet()
+
+# ✅ Prepare Dataset
+X = df.drop(columns=['Coffee Name', 'Image'])  # Remove 'Image' since it's not a feature
 y = df['Coffee Name']
 
 X.fillna("Unknown", inplace=True)
@@ -69,8 +67,7 @@ else:
 st.markdown(f"**✅ Model Accuracy:** `{accuracy:.2%}`")
 
 st.header("☕ Alex's Coffee Haven: AI Coffee Recommender")
-
-st.divider()  # Separates sections visually
+st.divider()
 
 # 🎯 **User Input Section**
 st.markdown("#### ☕ Select Your Preferences")
@@ -116,21 +113,16 @@ if st.button("🎯 Recommend Coffee"):
     
     # ✅ Fix: Remove [''] from output
     recommended_coffee = rfr_prediction[0] if isinstance(rfr_prediction, (list, np.ndarray)) else rfr_prediction  
-    recommended_coffee = str(recommended_coffee).strip("[]'")  # Remove unwanted characters
+    recommended_coffee = str(recommended_coffee).strip("[]'")  
 
     st.success(f"☕ **Your ideal coffee is: {recommended_coffee}**")
 
-    # ✅ Fix: Check multiple image formats (.png, .jpg, .jpeg)
-    image_path = None
-    for ext in ["png", "jpg", "jpeg"]:
-        possible_path = f"image/{recommended_coffee}.{ext}"
-        if os.path.exists(possible_path):
-            image_path = possible_path
-            break  # Stop checking once found
+    # ✅ Retrieve Image from Google Drive (Using Stored Links)
+    coffee_row = df[df["Coffee Name"] == recommended_coffee]
+    image_link = coffee_row["Image"].values[0] if not coffee_row.empty else None
 
-    # ✅ Display Image if found
-    if image_path:
-        st.image(image_path, caption=f"Your coffee: {recommended_coffee}")
+    if image_link:
+        st.image(image_link, caption=f"Your coffee: {recommended_coffee}")
     else:
         st.warning("⚠️ No image available for this coffee.")
 
