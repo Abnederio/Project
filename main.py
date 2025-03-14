@@ -88,6 +88,7 @@ else:
 st.markdown(f"**✅ Model Accuracy:** `{accuracy:.2%}`")
 
 st.header("☕ Alex's Coffee Haven: AI Coffee Recommender")
+st.image("Header.png", use_column_width=True)
 st.divider()
 
 # ✅ Retrieve Image from Google Drive
