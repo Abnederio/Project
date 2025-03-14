@@ -115,6 +115,7 @@ st.divider()
 col1, col2, col3 = st.columns([2, 2, 1])
 
 # ➕ **Add Coffee** in col1
+# ➕ **Add Coffee** in col1
 with col1:
     with st.form("add_coffee"):
         st.markdown("### ➕ Add New Coffee")
@@ -161,16 +162,17 @@ with col1:
                     "Weather": weather,
                 }] * 10)
 
-                # Add new coffee entry to df
-                df = pd.concat([new_entry, df], ignore_index=True)
+                # Convert the new coffee entry to a list of lists (to match the structure expected by Google Sheets API)
+                new_entry_list = new_entry.values.tolist()
 
-                # Save to Google Sheets
-                save_to_google_sheet(df)
+                # Append only the new rows to Google Sheets
+                sheet.append_rows(new_entry_list, value_input_option='RAW')
 
                 train_and_update_model()
                 st.success(f"☕ {name} added successfully!")
                 st.rerun()
 
+# ✏️ **Update Coffee** in col2
 # ✏️ **Update Coffee** in col2
 with col2:
     st.markdown("### ✏️ Update Coffee")
@@ -209,9 +211,19 @@ with col2:
                 df.loc[df["Coffee Name"] == selected_coffee, "Image"] = image_link
                 st.success("📸 Image updated successfully!")
 
-            # Save the updated data to Google Sheets
-            save_to_google_sheet(df)
-            st.success(f"✅ {new_name} updated successfully!")
+            # Fetch the existing data in Google Sheets
+            existing_data = sheet.get_all_records()
+
+            # Iterate over all rows and update rows where the coffee name matches
+            for i, row in enumerate(existing_data, start=2):  # starting at 2 because Sheet rows start from 1
+                if row["Coffee Name"] == selected_coffee:
+                    # Prepare the updated row data to match the columns
+                    updated_row = df[df["Coffee Name"] == selected_coffee].iloc[0].values.tolist()
+
+                    # Update the row in Google Sheets
+                    sheet.update(f'A{i}', [updated_row])  # Use f-string to reference the specific row
+
+            st.success(f"✅ {new_name} updated successfully in Google Sheets!")
             st.rerun()
 
 # 🗑 **Delete Coffee** in col3
