@@ -134,7 +134,7 @@ if st.button("🎯 Recommend Coffee"):
     image_link = get_image_url_from_drive(recommended_coffee)
 
     if image_link:
-        st.image(image_link, caption=f"{recommended_coffee}")
+        st.image(image_link, caption=f"Your coffee: {recommended_coffee}")
     else:
         st.warning("⚠️ No image available for this coffee.")
 
