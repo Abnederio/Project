@@ -60,27 +60,12 @@ def save_to_google_sheet(df):
         # Ensure all data is string and remove any unwanted columns
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')].astype(str).fillna("")
 
-        # Fetch existing data from the Google Sheet
-        existing_data = sheet.get_all_records()
-        df_existing = pd.DataFrame(existing_data)
+        # Convert the DataFrame to a list of lists (to match the structure expected by Google Sheets API)
+        new_entry_list = df.values.tolist()  # Convert to list of lists
 
-        # If there is new data to be added, append only the new rows
-        if len(df) > len(df_existing):  # Check if there is new data
-            new_rows = df.iloc[len(df_existing):].values.tolist()
-
-            # Debugging: Print new rows to be appended
-            st.write("New Rows to be appended:", new_rows)  # Debugging new rows
-
-            # Append new rows to Google Sheets, using proper headers
-            sheet.append_rows(new_rows, value_input_option='RAW')  # Using 'RAW' to avoid any special formatting issues
-            st.success("New rows appended to Google Sheets!")
-        else:
-            # If updating, update the entire sheet
-            chunk_size = 1000  # To avoid exceeding API limits
-            for i in range(0, len(df), chunk_size):
-                chunk = df.iloc[i:i + chunk_size]
-                sheet.update([df.columns.values.tolist()] + chunk.values.tolist())
-            st.success("Google Sheets updated successfully!")
+        # Append new rows to Google Sheets, using proper headers
+        sheet.append_rows(new_entry_list, value_input_option='RAW')
+        st.success("Google Sheets updated successfully!")
 
         return True  # Return True if successful
 
@@ -175,15 +160,6 @@ with col1:
                     "Bitterness Level": bitterness_level,
                     "Weather": weather,
                 }] * 10)
-                
-                # Convert the DataFrame to a list of lists (to match the structure expected by Google Sheets API)
-                new_entry_list = new_entry.values.tolist()  # Convert to list of lists
-
-                # Append the new rows to Google Sheets
-                sheet.append_rows(new_entry_list, value_input_option='RAW')
-
-                # Debugging: Check the new coffee entry before adding it to df
-                st.write("New Coffee Entry to be Added:", new_entry.head())  # Debugging new entry
 
                 # Add new coffee entry to df
                 df = pd.concat([new_entry, df], ignore_index=True)
@@ -259,6 +235,7 @@ if st.button("🏠 Go Back to Menu"):
 if st.button("🚪 Logout"):
     st.session_state.token = None
     st.switch_page("pages/admin.py")
+
 
 
 
