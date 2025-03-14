@@ -209,7 +209,6 @@ with col2:
             st.rerun()
 
 # 🗑 **Delete Coffee** in col3
-# 🗑 **Delete Coffee** in col3
 with col3:
     st.markdown("### 🗑 Delete Coffee")
     delete_coffee = st.selectbox("Select coffee to delete:", df["Coffee Name"].dropna().unique())
@@ -239,12 +238,13 @@ with col3:
             try:
                 existing_data = sheet.get_all_records()
 
-                # Iterate over all rows and delete rows where the coffee name matches
-                for i, row in enumerate(existing_data, start=2):  # starting at 2 because Sheet rows start from 1
+                # Iterate over all rows and delete all rows where the coffee name matches
+                for i in range(len(existing_data) - 1, -1, -1):  # Start from the last row and move up
+                    row = existing_data[i]
                     if row["Coffee Name"] == delete_coffee:
                         # Delete the row from Google Sheets
-                        sheet.delete_rows(i)
-                        break  # Exit loop after deleting the row
+                        sheet.delete_rows(i + 2)  # Add 2 because sheet rows are 1-based and we start from row 2
+                        st.write(f"Deleted row {i + 2} for {delete_coffee}")
 
                 st.success(f"🗑 {delete_coffee} deleted successfully from Google Sheets!")
                 train_and_update_model()  # Retrain the model with the updated data
