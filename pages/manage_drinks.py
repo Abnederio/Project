@@ -151,10 +151,10 @@ with col1:
                     
                     # Insert only the new rows to Google Sheets
                     
-                    sheet.insert_rows(2, values=first_5)
+                    sheet.insert_rows(2, first_5)
                     existing_rows = len(sheet.get_all_values())
                     insert_at = min(5000, existing_rows + 1) 
-                    sheet.insert_rows(insert_at, values=second_5)
+                    sheet.insert_rows(insert_at, second_5)
                     
                     st.success("Google Sheets updated successfully!")
                     train_and_update_model()
