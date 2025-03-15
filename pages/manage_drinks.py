@@ -145,9 +145,17 @@ with col1:
 
                 try:
                     # Convert the new coffee entry to a list of lists (to match the structure expected by Google Sheets API)
-                    new_entry_list = new_entry.values.tolist()
-                    # Append only the new rows to Google Sheets
-                    sheet.append_rows(new_entry_list, value_input_option='RAW')
+                    # ✅ Split into two parts
+                    first_5 = new_entry.iloc[:5].values.tolist()  # First 5 rows
+                    second_5 = new_entry.iloc[5:].values.tolist()  # Last 5 rows
+                    
+                    # Insert only the new rows to Google Sheets
+                    
+                    sheet.insert_rows(2, values=first_5)
+                    existing_rows = len(sheet.get_all_values())
+                    insert_at = min(5000, existing_rows + 1) 
+                    sheet.insert_rows(insert_at, values=second_5)
+                    
                     st.success("Google Sheets updated successfully!")
                     train_and_update_model()
                     st.success(f"☕ {name} added successfully!")
