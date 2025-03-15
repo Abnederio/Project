@@ -11,21 +11,7 @@ from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-# CSS
-st.markdown(
-    """
-    <style>
-    body {
-        background-color: #A27B5C;
-    }
-    .stApp {
-        background-color: #A27B5C; 
-    }
 
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="wide")
