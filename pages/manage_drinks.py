@@ -13,6 +13,9 @@ from sklearn.metrics import accuracy_score
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="wide")
 
+if 'token' not in st.session_state or st.session_state.token is None:
+    st.switch_page("pages/admin.py") 
+
 # 🔹 Google Sheets Setup
 SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"  # Your Google Sheet ID
 SCOPE = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.file"]
@@ -266,12 +269,17 @@ with col3:
 
 st.divider()
 
-if st.button("🏠 Go Back to Menu"):
-    st.switch_page("pages/menu.py")
+# Navigation Buttons
+col1, col2 = st.columns(2)
 
-if st.button("🚪 Logout"):
-    st.session_state.token = None
-    st.switch_page("pages/admin.py")
+with col1:
+    if st.button("🏠 Go Back to Menu"):
+        st.switch_page("pages/menu.py")
+
+with col2:
+    if st.button("🚪 Logout"):
+        st.session_state.token = None
+        st.switch_page("pages/admin.py")
 
 
 
