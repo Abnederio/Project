@@ -226,6 +226,7 @@ with col3:
             # Get the image link for the selected coffee to delete from Google Drive
             coffee_data = df[df["Coffee Name"] == delete_coffee].iloc[0]
             image_link = coffee_data["Image"] if "Image" in coffee_data else None
+
             if image_link:
                 # Extract the image ID from the link
                 image_id = image_link.split('=')[-1]
@@ -242,27 +243,32 @@ with col3:
             # Remove the coffee from the DataFrame
             df = df[df["Coffee Name"] != delete_coffee]
 
-            # Update Google Sheets to reflect the deletion
+            # ✅ Move Google Sheets deletion logic outside of the image deletion block
             try:
                 existing_data = sheet.get_all_records()
-                
+
+                # Find all rows to delete
                 rows_to_delete = [i + 2 for i, row in enumerate(existing_data) if row["Coffee Name"] == delete_coffee]
 
                 if rows_to_delete:
                     rows_to_delete.sort(reverse=True)  # Delete from bottom to top to avoid shifting issues
 
-                    try:
-                        for row in rows_to_delete:
-                            sheet.delete_rows(row)
-                            st.write(f"Deleted row {row} for {delete_coffee}")
+                    for row in rows_to_delete:
+                        sheet.delete_rows(row)
+                        st.write(f"Deleted row {row} for {delete_coffee}")
 
-                        st.success(f"🗑 {delete_coffee} deleted successfully from Google Sheets!")
-                        train_and_update_model()  # Retrain with the updated data
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Error updating Google Sheets: {e}")
+                    st.success(f"🗑 {delete_coffee} deleted successfully from Google Sheets!")
+                    train_and_update_model()  # Retrain with the updated data
+                    st.rerun()
                 else:
-                    st.error("❌ Please select a coffee to delete.")
+                    st.error("❌ Coffee not found in Google Sheets.")
+
+            except Exception as e:
+                st.error(f"Error updating Google Sheets: {e}")
+
+        else:
+            st.error("❌ Please select a coffee to delete.")
+
 
 st.divider()
 
