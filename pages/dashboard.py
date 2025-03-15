@@ -91,7 +91,7 @@ with st.sidebar:
 
 # Load Data
 
-dataset = pd.read_csv(df)
+dataset = df
 
 # Pages Logic
 if st.session_state.page_selection == "about":
