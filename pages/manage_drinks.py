@@ -60,6 +60,7 @@ def train_and_update_model():
 
     df = load_google_sheet()
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+    df = df.sample(frac=1, random_state=42).reset_index(drop=True)
 
     features = ["Caffeine Level", "Sweetness", "Type", "Roast Level", "Milk Type",
                 "Flavor Notes", "Bitterness Level", "Weather"]
@@ -204,7 +205,9 @@ with col2:
 
                     # Update the row in Google Sheets
                     sheet.update(f'A{i}', [updated_row])  # Use f-string to reference the specific row
-
+            
+            train_and_update_model()   
+                
             st.success(f"✅ {new_name} updated successfully in Google Sheets!")
             st.rerun()
 
