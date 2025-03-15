@@ -11,6 +11,9 @@ from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
+
+
+
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="wide")
 
 if 'token' not in st.session_state or st.session_state.token is None:

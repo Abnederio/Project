@@ -18,6 +18,22 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+# CSS
+st.markdown(
+    """
+    <style>
+    body {
+        background-color: #A27B5C;
+    }
+    .stApp {
+        background-color: #A27B5C; 
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # Initialize session state if not set
 if 'page_selection' not in st.session_state:
@@ -80,6 +96,7 @@ dataset = pd.read_csv(df)
 # Pages Logic
 if st.session_state.page_selection == "about":
     st.header("ℹ️ About")
+    st.write("Alex's Brew Haven is a coffeehouse, celebrated for its high-quality beverages and commitment to innovation. To further enhance the customer experience, this application recommends a drink based on users’ wants. This app aims to provide a seamless and customized ordering experience, helping customers discover new favorites while streamlining operations. By integrating technology with our passion for great coffee, we strive to deliver convenience, efficiency, and a great coffee journey for every customer.")
     
 elif st.session_state.page_selection == "dataset":
     st.header("📊 Coffee Dataset")
