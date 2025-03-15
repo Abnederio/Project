@@ -9,7 +9,6 @@ API_URL = "https://project-a2bt.onrender.com"
 # ✅ Custom CSS for a cleaner UI
 st.markdown("""
     <style>
-        [data-testid="stSidebar"] { display: none; }  /* Hide Sidebar */
         div.stButton > button {
             width: 100%;
             border-radius: 10px;
