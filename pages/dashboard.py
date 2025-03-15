@@ -3,6 +3,12 @@ import pandas as pd
 import altair as alt
 import plotly.express as px
 from pages import menu
+import google.generativeai as genai
+from oauth2client.service_account import ServiceAccountCredentials
+import gspread
+from googleapiclient.discovery import build
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 
 # Page configuration
@@ -16,6 +22,23 @@ st.set_page_config(
 # Initialize session state if not set
 if 'page_selection' not in st.session_state:
     st.session_state.page_selection = 'about'  # Default page
+    
+# ✅ Google Sheets Setup
+SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
+SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+CREDS_FILE = "civic-pulsar-453709-f7-10c1906e9ce5.json"  # Ensure this file is in the project directory
+
+# ✅ Authenticate Google Sheets
+creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
+client = gspread.authorize(creds)
+sheet = client.open_by_key(SHEET_ID).sheet1
+
+def load_google_sheet():
+    """Load coffee data from Google Sheets."""
+    data = sheet.get_all_records()
+    return pd.DataFrame(data)
+
+df = load_google_sheet()
 
 # Function to update page selection
 def set_page_selection(page):
@@ -51,7 +74,8 @@ with st.sidebar:
     """)
 
 # Load Data
-dataset = pd.read_csv("coffee_dataset.csv")
+
+dataset = pd.read_csv(df)
 
 # Pages Logic
 if st.session_state.page_selection == "about":
