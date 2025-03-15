@@ -245,23 +245,24 @@ with col3:
             # Update Google Sheets to reflect the deletion
             try:
                 existing_data = sheet.get_all_records()
+                
+                rows_to_delete = [i + 2 for i, row in enumerate(existing_data) if row["Coffee Name"] == delete_coffee]
 
-                # Iterate over all rows and delete all rows where the coffee name matches
-                for i in range(len(existing_data) - 1, -1, -1):  # Start from the last row and move up
-                    row = existing_data[i]
-                    if row["Coffee Name"] == delete_coffee:
-                        # Delete the row from Google Sheets
-                        sheet.delete_rows(i + 2)  # Add 2 because sheet rows are 1-based and we start from row 2
-                        st.write(f"Deleted row {i + 2} for {delete_coffee}")
+                if rows_to_delete:
+                    rows_to_delete.sort(reverse=True)  # Delete from bottom to top to avoid shifting issues
 
-                st.success(f"🗑 {delete_coffee} deleted successfully from Google Sheets!")
-                train_and_update_model()  # Retrain the model with the updated data
-                st.rerun()
+                    try:
+                        for row in rows_to_delete:
+                            sheet.delete_rows(row)
+                            st.write(f"Deleted row {row} for {delete_coffee}")
 
-            except Exception as e:
-                st.error(f"Error updating Google Sheets: {e}")
-        else:
-            st.error("❌ Please select a coffee to delete.")
+                        st.success(f"🗑 {delete_coffee} deleted successfully from Google Sheets!")
+                        train_and_update_model()  # Retrain with the updated data
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error updating Google Sheets: {e}")
+                else:
+                    st.error("❌ Please select a coffee to delete.")
 
 st.divider()
 
