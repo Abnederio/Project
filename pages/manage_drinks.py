@@ -207,8 +207,7 @@ with col2:
                     # Update the row in Google Sheets
                     sheet.update(f'A{i}', [updated_row])  # Use f-string to reference the specific row
                     
-            train_and_update_model()
-            
+            train_and_update_model()         
             st.success(f"✅ {new_name} updated successfully.")
             st.rerun()
 
