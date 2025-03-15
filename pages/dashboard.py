@@ -1,4 +1,12 @@
 import streamlit as st
+
+st.set_page_config(
+    page_title="Admin Dashboard",  
+    page_icon="assets/icon.png",  
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 import pandas as pd
 import altair as alt
 import plotly.express as px
@@ -11,13 +19,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 
-# Page configuration
-st.set_page_config(
-    page_title="Admin Dashboard",  
-    page_icon="assets/icon.png",  
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+
 # CSS
 st.markdown(
     """
