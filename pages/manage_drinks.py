@@ -60,7 +60,6 @@ def train_and_update_model():
 
     df = load_google_sheet()
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-    df = df.sample(frac=1, random_state=42).reset_index(drop=True)
 
     features = ["Caffeine Level", "Sweetness", "Type", "Roast Level", "Milk Type",
                 "Flavor Notes", "Bitterness Level", "Weather"]
@@ -192,6 +191,8 @@ with col2:
                 
                 # Update the image link in the DataFrame
                 df.loc[df["Coffee Name"] == selected_coffee, "Image"] = image_link
+                
+               
                 st.success("📸 Image updated successfully!")
 
             # Fetch the existing data in Google Sheets
@@ -205,10 +206,10 @@ with col2:
 
                     # Update the row in Google Sheets
                     sheet.update(f'A{i}', [updated_row])  # Use f-string to reference the specific row
+                    
+            train_and_update_model()
             
-            train_and_update_model()   
-                
-            st.success(f"✅ {new_name} updated successfully in Google Sheets!")
+            st.success(f"✅ {new_name} updated successfully.")
             st.rerun()
 
 # 🗑 **Delete Coffee** in col3
