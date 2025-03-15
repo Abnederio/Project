@@ -157,7 +157,7 @@ if st.button("🎯 Recommend Coffee"):
     # ✅ Gemini AI Explanation
     genai.configure(api_key="AIzaSyAXpLVdg1s1dpRj0-Crb7HYhr2xHvGUffg")
     ai_model = genai.GenerativeModel("gemini-2.0-flash")
-    response = ai_model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features}. Explain in 5 sentences.")
+    response = ai_model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features} make it like a true salesperson. Explain in 5 sentences.")
     
     explanation = response.text
 
