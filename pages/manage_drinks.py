@@ -147,7 +147,7 @@ with col1:
                     # Convert the new coffee entry to a list of lists (to match the structure expected by Google Sheets API)
                     new_entry_list = new_entry.values.tolist()
                     # Append only the new rows to Google Sheets
-                    sheet.insert_row(new_entry_list, 2,  value_input_option='RAW')
+                    sheet.append_rows(new_entry_list, value_input_option='RAW')
                     st.success("Google Sheets updated successfully!")
                     train_and_update_model()
                     st.success(f"☕ {name} added successfully!")
