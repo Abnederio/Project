@@ -12,6 +12,22 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+# CSS
+st.markdown(
+    """
+    <style>
+    body {
+        background-color: #A27B5C;
+    }
+    .stApp {
+        background-color: #A27B5C; 
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # Initialize session state if not set
 if 'page_selection' not in st.session_state:
