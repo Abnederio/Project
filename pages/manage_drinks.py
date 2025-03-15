@@ -144,17 +144,20 @@ with col1:
                 }] * 10)
 
                 try:
-                    # Convert new coffee entry to a list of lists (Google Sheets API format)
                     new_coffee_rows = new_entry.values.tolist()
 
-                    # Insert all rows at row 2 (below headers)
-                    sheet.insert_rows(2, new_coffee_rows)
+                    # Ensure we get the correct row count
+                    existing_data = sheet.get_all_values()  
+                    existing_rows = len(existing_data) if existing_data else 1  # Ensure it's an integer
+
+                    insert_at = min(5000, max(2, existing_rows + 1))  # Avoids negative indices
+
+                    # Insert new rows
+                    sheet.insert_rows(insert_at, new_coffee_rows)
 
                     st.success("✅ Google Sheets updated successfully!")
-
                     train_and_update_model()
                     st.success(f"☕ {name} added successfully!")
-
                     st.rerun()
 
                 except Exception as e:
