@@ -36,22 +36,21 @@ if "page_selection" not in st.session_state:
 def set_page_selection(page):
     st.session_state.page_selection = page
 
-# ✅ Custom CSS for Coffee-Themed Styling
-# ✅ Custom CSS for Improved Coffee Theme (No Red)
+# ✅ Custom CSS for Perfect Coffee Shop Theme
 st.markdown(
     """
     <style>
         /* Background */
         body {
-            background-color: #ECE3CE !important;  /* Creamy Cappuccino */
+            background-color: #F5E8C7 !important;  /* Creamy Latte */
         }
         .stApp {
-            background-color: #ECE3CE !important;  /* Soft warm tone */
+            background-color: #F5E8C7 !important;  /* Soft welcoming tone */
         }
 
         /* Sidebar Styling */
         section[data-testid="stSidebar"] {
-            background-color: #6D4C41 !important;  /* Rich Mocha */
+            background-color: #754F44 !important;  /* Espresso Brown */
         }
 
         /* General Button Styling */
@@ -65,43 +64,43 @@ st.markdown(
             font-weight: bold;
         }
         
-        /* Brown Button (Go Back) */
+        /* Caramel Button (Go Back) */
         div.stButton > button:first-child {
-            background-color: #8B5E3B;  /* Warm Espresso */
+            background-color: #A67B5B;  /* Warm Caramel */
             color: white;
         }
         div.stButton > button:first-child:hover {
-            background-color: #6D4C41;  /* Dark Mocha */
+            background-color: #8D6C4F;  /* Toasted Brown */
             transform: scale(1.05);  
         }
 
-        /* Neutral Button (Logout) */
+        /* Mocha Button (Logout) */
         div.stButton > button:last-child {
-            background-color: #5E503F;  /* Deep Mocha */
+            background-color: #5E503F;  /* Dark Mocha */
             color: white;
         }
         div.stButton > button:last-child:hover {
-            background-color: #4E4237;  /* Darker Mocha */
+            background-color: #4A4032;  /* Richer Mocha */
             transform: scale(1.05);
         }
         
         /* Sidebar Buttons */
         .st-emotion-cache-ocqkz7:hover { 
-            background-color: #5B3A29 !important;  /* Dark coffee brown */
+            background-color: #6B4E3D !important;  /* Darker Espresso */
             color: white !important;
         }
 
         /* Headers & Text */
         h1, h2, h3, h4, h5, h6 {
-            color: #4E342E !important;  /* Dark Chocolate */
+            color: #3E2723 !important;  /* Roasted Coffee */
         }
         p, div {
-            color: #3E2723 !important;  /* Rich Espresso Text */
+            color: #4E342E !important;  /* Dark Cocoa Text */
         }
 
         /* Dataset Table */
         .stDataFrame {
-            background-color: #F5E1C8 !important;  /* Light Cappuccino */
+            background-color: #F0D9B5 !important;  /* Light Cappuccino */
             color: #3E2723 !important;  /* Mocha text */
         }
 
