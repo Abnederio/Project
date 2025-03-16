@@ -190,30 +190,8 @@ elif st.session_state.page_selection == "machine_learning":
 
 elif st.session_state.page_selection == "prediction":
     st.header("👀 Prediction Accuracy")
-    model = "catboost_model.pkl"
     accuracy = joblib.load("catboost_accuracy.pkl")
     st.success(f"✅ The model achieved **{accuracy * 100:.2f}%** accuracy.")
-    
-    # ✅ Extract feature importance dynamically
-    feature_importance_df = pd.DataFrame({
-            "feature": model.feature_names_,
-            "importance": model.get_feature_importance()
-        }).nlargest(5, 'importance')  # Get top 5 most important features
-     # Display feature importance
-    st.subheader("🔍 Top Features Impacting Predictions")
-    st.write("These features have the highest influence on the model's predictions:")
-
-    fig = px.bar(
-            feature_importance_df, 
-            x='feature', 
-            y='importance', 
-            title="Top 5 Features Affecting Predictions", 
-            labels={'importance': 'Feature Importance Score'},
-            color='importance',
-            color_continuous_scale='Blues'
-        )
-    st.plotly_chart(fig, use_container_width=True)
-
 
 # ✅ Navigation Buttons
 col1, col2 = st.columns(2)
