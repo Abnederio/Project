@@ -111,8 +111,7 @@ st.markdown(
 )
 
 # ✅ Sidebar Navigation
-with st.sidebar:
-    st.image("assets/shop.jpeg", use_container_width=True, Height = 500)  # Resized sidebar image
+with st.sidebar:  
     st.title("☕ Admin Dashboard")
     st.subheader("📌 Pages")
 
@@ -147,7 +146,7 @@ dataset = df
 
 # ✅ Page Logic (Switch Pages)
 if st.session_state.page_selection == "about":
-    st.image("assets/shop.jpeg", width=500)  # Resized image
+    st.image("assets/shop.jpeg", use_container_width=True)  # Resized image
     st.header("ℹ️ Welcome to Alex's Brew Haven ☕")
     st.write("""
     **Alex's Brew Haven** is a coffeehouse known for its **premium coffee** and **innovative flavors**.  
