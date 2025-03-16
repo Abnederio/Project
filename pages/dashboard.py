@@ -36,9 +36,82 @@ if "page_selection" not in st.session_state:
 def set_page_selection(page):
     st.session_state.page_selection = page
 
+# ✅ Custom CSS for Coffee-Themed Styling
+st.markdown(
+    """
+    <style>
+        /* Background */
+        body {
+            background-color: #D7B49E !important;  /* Warm latte beige */
+        }
+        .stApp {
+            background-color: #D7B49E !important;  /* Consistent warm beige */
+        }
+
+        /* Sidebar Styling */
+        section[data-testid="stSidebar"] {
+            background-color: #A27B5C !important;  /* Warm coffee brown */
+        }
+
+        /* General Button Styling */
+        div.stButton > button {
+            width: 100%;
+            font-size: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            transition: 0.3s ease-in-out;
+            border: none;
+            font-weight: bold;
+        }
+        
+        /* Green Button (Go Back) */
+        div.stButton > button:first-child {
+            background-color: #6F4E37;  /* Coffee brown */
+            color: white;
+        }
+        div.stButton > button:first-child:hover {
+            background-color: #5B3A29;  /* Darker brown on hover */
+            transform: scale(1.05);  
+        }
+
+        /* Red Button (Logout) */
+        div.stButton > button:last-child {
+            background-color: #9C2C18;  /* Rich espresso red */
+            color: white;
+        }
+        div.stButton > button:last-child:hover {
+            background-color: #721E0E;  /* Darker espresso */
+            transform: scale(1.05);
+        }
+        
+        /* Sidebar Buttons */
+        .st-emotion-cache-ocqkz7:hover { 
+            background-color: #5B3A29 !important;  /* Dark coffee brown */
+            color: white !important;
+        }
+
+        /* Headers & Text */
+        h1, h2, h3, h4, h5, h6 {
+            color: #4A3F35 !important;  /* Soft dark brown */
+        }
+        p, div {
+            color: #3E3129 !important;  /* Warm mocha text */
+        }
+
+        /* Dataset Table */
+        .stDataFrame {
+            background-color: #F5E1C8 !important;  /* Light cappuccino color */
+            color: #3E3129 !important;  /* Mocha text */
+        }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # ✅ Sidebar Navigation
 with st.sidebar:
-    st.image("assets/shop.jpeg", width=500)  # Coffee shop image at the top
+    st.image("assets/shop.jpeg", width=250)  # Resized sidebar image
     st.title("☕ Admin Dashboard")
     st.subheader("📌 Pages")
 
@@ -52,7 +125,7 @@ with st.sidebar:
         "👀 Prediction": "prediction"
     }
 
-    # ✅ Sidebar Buttons - Styled
+    # ✅ Sidebar Buttons
     for label, key in pages.items():
         if st.button(label, key=key, use_container_width=True):
             st.session_state.page_selection = key
@@ -73,7 +146,7 @@ dataset = df
 
 # ✅ Page Logic (Switch Pages)
 if st.session_state.page_selection == "about":
-    st.image("assets/shop.jpeg", use_container_width=True)  # Large image at the top
+    st.image("assets/shop.jpeg", width=500)  # Resized image
     st.header("ℹ️ Welcome to Alex's Brew Haven ☕")
     st.write("""
     **Alex's Brew Haven** is a coffeehouse known for its **premium coffee** and **innovative flavors**.  
@@ -91,25 +164,19 @@ if st.session_state.page_selection == "about":
 elif st.session_state.page_selection == "dataset":
     st.header("📊 Coffee Dataset")
     st.write("This dataset contains various coffee types with attributes such as caffeine level, sweetness, type, roast level, milk type, flavor notes, and bitterness level.")
-    
     st.dataframe(dataset)  
-
     st.subheader("📊 Coffee Type Distribution")
     pie_chart = px.pie(dataset, names="Coffee Name", title="Coffee Type Percentage")
     st.plotly_chart(pie_chart, use_container_width=True)
 
 elif st.session_state.page_selection == "eda":
     st.header("📈 Exploratory Data Analysis (EDA)")
-    st.subheader("🔍 Select an Attribute to Visualize")
-    
     selected_column = st.selectbox("Choose an Attribute:", dataset.columns)
     bar_chart = px.bar(dataset, x="Coffee Name", y=selected_column, title=f"Distribution of {selected_column}")
     st.plotly_chart(bar_chart, use_container_width=True)
 
 elif st.session_state.page_selection == "data_cleaning":
     st.header("🧼 Data Cleaning & Pre-processing")
-    st.subheader("🔍 Null Values Check")
-
     null_values = dataset.isnull().sum().sum()
     if null_values == 0:
         st.success("✅ The dataset contains **0** null values.")
@@ -123,31 +190,19 @@ elif st.session_state.page_selection == "machine_learning":
 elif st.session_state.page_selection == "prediction":
     st.header("👀 Prediction Accuracy")
     model_accuracy = 0.94  # Replace with actual accuracy
-    st.subheader("📊 Model Training Accuracy")
-    st.success(f"✅ The model achieved **{model_accuracy * 100:.2f}%** accuracy on the training dataset.")
+    st.success(f"✅ The model achieved **{model_accuracy * 100:.2f}%** accuracy.")
 
-# ✅ Divider
-st.divider()
-
-# ✅ Navigation Buttons - Styled
+# ✅ Navigation Buttons
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown(
-        '<style>div.stButton > button:first-child { width: 100%; background-color: #4CAF50; color: white; font-size: 16px; padding: 10px; border-radius: 5px; }</style>',
-        unsafe_allow_html=True
-    )
-    if st.button("🏠 Go Back to Menu", use_container_width=True):
-        st.session_state.page_selection = "about"  # Redirect to Home
-        st.switch_page("pages/menu.py")
+    if st.button("🏠 Go Back to Menu"):
+        st.session_state.page_selection = "about"
 
 with col2:
-    st.markdown(
-        '<style>div.stButton > button:first-child { width: 100%; background-color: #d9534f; color: white; font-size: 16px; padding: 10px; border-radius: 5px; }</style>',
-        unsafe_allow_html=True
-    )
-    if st.button("🚪 Logout", use_container_width=True):
+    if st.button("🚪 Logout"):
         st.session_state.token = None
         st.switch_page("pages/admin.py")
+
 
 
