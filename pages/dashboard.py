@@ -4,7 +4,6 @@ import plotly.express as px
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
 import joblib
-import os
 from sklearn.metrics import accuracy_score
 
 # ✅ Set Page Configuration
@@ -38,6 +37,79 @@ if "page_selection" not in st.session_state:
 # ✅ Function to update page selection
 def set_page_selection(page):
     st.session_state.page_selection = page
+
+# ✅ Custom CSS for Perfect Coffee Shop Theme
+st.markdown(
+    """
+    <style>
+        /* Background */
+        body {
+            background-color: #F5E8C7 !important;  /* Creamy Latte */
+        }
+        .stApp {
+            background-color: #F5E8C7 !important;  /* Soft welcoming tone */
+        }
+
+        /* Sidebar Styling */
+        section[data-testid="stSidebar"] {
+            background-color: #754F44 !important;  /* Espresso Brown */
+        }
+
+        /* General Button Styling */
+        div.stButton > button {
+            width: 100%;
+            font-size: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            transition: 0.3s ease-in-out;
+            border: none;
+            font-weight: bold;
+        }
+        
+        /* Caramel Button (Go Back) */
+        div.stButton > button:first-child {
+            background-color: #A67B5B;  /* Warm Caramel */
+            color: white;
+        }
+        div.stButton > button:first-child:hover {
+            background-color: #8D6C4F;  /* Toasted Brown */
+            transform: scale(1.05);  
+        }
+
+        /* Mocha Button (Logout) */
+        div.stButton > button:last-child {
+            background-color: #5E503F;  /* Dark Mocha */
+            color: white;
+        }
+        div.stButton > button:last-child:hover {
+            background-color: #4A4032;  /* Richer Mocha */
+            transform: scale(1.05);
+        }
+        
+        /* Sidebar Buttons */
+        .st-emotion-cache-ocqkz7:hover { 
+            background-color: #6B4E3D !important;  /* Darker Espresso */
+            color: white !important;
+        }
+
+        /* Headers & Text */
+        h1, h2, h3, h4, h5, h6 {
+            color: #3E2723 !important;  /* Roasted Coffee */
+        }
+        p, div {
+            color: #4E342E !important;  /* Dark Cocoa Text */
+        }
+
+        /* Dataset Table */
+        .stDataFrame {
+            background-color: #F0D9B5 !important;  /* Light Cappuccino */
+            color: #3E2723 !important;  /* Mocha text */
+        }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # ✅ Sidebar Navigation
 with st.sidebar:  
@@ -75,11 +147,19 @@ dataset = df
 
 # ✅ Page Logic (Switch Pages)
 if st.session_state.page_selection == "about":
-    st.image("assets/shop.jpeg", use_container_width=True)
+    st.image("assets/shop.jpeg", use_container_width=True)  # Resized image
     st.header("ℹ️ Welcome to Alex's Brew Haven ☕")
     st.write("""
     **Alex's Brew Haven** is a coffeehouse known for its **premium coffee** and **innovative flavors**.  
     This application enhances the customer experience by **recommending personalized drinks** based on preferences.  
+    """)
+    
+    st.markdown("""
+    ### **✨ Why Choose Us?**
+    - **🌱 Organic & Sustainable Coffee**
+    - **👨‍🔬 Expertly Crafted Recipes**
+    - **📲 Seamless & Smart Ordering**
+    - **🎯 AI-Powered Drink Recommendations**
     """)
 
 elif st.session_state.page_selection == "dataset":
@@ -110,36 +190,8 @@ elif st.session_state.page_selection == "machine_learning":
 
 elif st.session_state.page_selection == "prediction":
     st.header("👀 Prediction Accuracy")
-
-    # ✅ Load model accuracy safely
-    accuracy_file = "catboost_accuracy.pkl"
-    if os.path.exists(accuracy_file):
-        accuracy = joblib.load(accuracy_file)
-        st.success(f"✅ The model achieved **{accuracy * 100:.2f}%** accuracy.")
-    else:
-        st.warning("⚠️ Accuracy file not found. Please ensure the model has been trained and saved properly.")
-
-    # ✅ Load feature importance safely
-    feature_importance_file = "catboost_feature_importance.pkl"
-    if os.path.exists(feature_importance_file):
-        feature_importance = joblib.load(feature_importance_file)
-        important_features = feature_importance.nlargest(5, 'importance')
-
-        st.subheader("🔍 Top Features Impacting Predictions")
-        st.write("These features have the highest influence on the model's predictions:")
-
-        fig = px.bar(
-            important_features, 
-            x='feature', 
-            y='importance', 
-            title="Top 5 Features Affecting Predictions", 
-            labels={'importance': 'Feature Importance Score'},
-            color='importance',
-            color_continuous_scale='Blues'
-        )
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.warning("⚠️ Feature importance file not found. Please ensure the model has been trained and saved properly.")
+    accuracy = joblib.load("catboost_accuracy.pkl")
+    st.success(f"✅ The model achieved **{accuracy * 100:.2f}%** accuracy.")
 
 # ✅ Navigation Buttons
 col1, col2 = st.columns(2)
@@ -147,12 +199,12 @@ col1, col2 = st.columns(2)
 with col1:
     if st.button("🏠 Go Back to Menu"):
         st.session_state.page_selection = "about"
-        st.switch_page("pages/menu.py")
+        st.switch_page("pages/home.py")
 
 with col2:
     if st.button("🚪 Logout"):
         st.session_state.token = None
-
+        st.switch_page("pages/admin.py")
 
 
 
