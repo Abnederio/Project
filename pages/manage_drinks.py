@@ -78,9 +78,14 @@ def train_and_update_model():
 
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
+    feature_importance_df = pd.DataFrame({
+    "feature": X_train.columns,
+    "importance": model.get_feature_importance()
+})
 
     joblib.dump(model, "catboost_model.pkl")
     joblib.dump(accuracy, "catboost_accuracy.pkl")
+    joblib.dump(feature_importance_df, "catboost_feature_importance.pkl")
 
     st.success(f"✅ Model retrained! New accuracy: {accuracy:.2%}")
 
