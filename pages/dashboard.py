@@ -16,8 +16,6 @@ from googleapiclient.discovery import build
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-
-
 # CSS
 st.markdown(
     """
@@ -137,13 +135,4 @@ elif st.session_state.page_selection == "prediction":
 st.divider()
 
 # Navigation Buttons
-col1, col2 = st.columns(2)
 
-with col1:
-    if st.button("🏠 Go Back to Menu"):
-        st.switch_page("pages/menu.py")
-
-with col2:
-    if st.button("🚪 Logout"):
-        st.session_state.token = None
-        st.switch_page("pages/admin.py")
