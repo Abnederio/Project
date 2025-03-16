@@ -12,6 +12,7 @@ scikit-learn
 numpy
 pandas
 google-generativeai
+google-api-python-client
 
 # Server & Deployment
 gunicorn
@@ -22,4 +23,5 @@ pydrive
 # Database (Only if using PostgreSQL)
 flask-sqlalchemy
 psycopg2-binary
+
 
