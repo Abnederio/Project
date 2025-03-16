@@ -37,20 +37,21 @@ def set_page_selection(page):
     st.session_state.page_selection = page
 
 # ✅ Custom CSS for Coffee-Themed Styling
+# ✅ Custom CSS for Improved Coffee Theme (No Red)
 st.markdown(
     """
     <style>
         /* Background */
         body {
-            background-color: #D7B49E !important;  /* Warm latte beige */
+            background-color: #ECE3CE !important;  /* Creamy Cappuccino */
         }
         .stApp {
-            background-color: #D7B49E !important;  /* Consistent warm beige */
+            background-color: #ECE3CE !important;  /* Soft warm tone */
         }
 
         /* Sidebar Styling */
         section[data-testid="stSidebar"] {
-            background-color: #A27B5C !important;  /* Warm coffee brown */
+            background-color: #6D4C41 !important;  /* Rich Mocha */
         }
 
         /* General Button Styling */
@@ -64,23 +65,23 @@ st.markdown(
             font-weight: bold;
         }
         
-        /* Green Button (Go Back) */
+        /* Brown Button (Go Back) */
         div.stButton > button:first-child {
-            background-color: #6F4E37;  /* Coffee brown */
+            background-color: #8B5E3B;  /* Warm Espresso */
             color: white;
         }
         div.stButton > button:first-child:hover {
-            background-color: #5B3A29;  /* Darker brown on hover */
+            background-color: #6D4C41;  /* Dark Mocha */
             transform: scale(1.05);  
         }
 
-        /* Red Button (Logout) */
+        /* Neutral Button (Logout) */
         div.stButton > button:last-child {
-            background-color: #C14438 ;  /* Rich espresso red */
+            background-color: #5E503F;  /* Deep Mocha */
             color: white;
         }
         div.stButton > button:last-child:hover {
-            background-color: #721E0E;  /* Darker espresso */
+            background-color: #4E4237;  /* Darker Mocha */
             transform: scale(1.05);
         }
         
@@ -92,16 +93,16 @@ st.markdown(
 
         /* Headers & Text */
         h1, h2, h3, h4, h5, h6 {
-            color: #4A3F35 !important;  /* Soft dark brown */
+            color: #4E342E !important;  /* Dark Chocolate */
         }
         p, div {
-            color: #3E3129 !important;  /* Warm mocha text */
+            color: #3E2723 !important;  /* Rich Espresso Text */
         }
 
         /* Dataset Table */
         .stDataFrame {
-            background-color: #F5E1C8 !important;  /* Light cappuccino color */
-            color: #3E3129 !important;  /* Mocha text */
+            background-color: #F5E1C8 !important;  /* Light Cappuccino */
+            color: #3E2723 !important;  /* Mocha text */
         }
 
     </style>
@@ -111,7 +112,7 @@ st.markdown(
 
 # ✅ Sidebar Navigation
 with st.sidebar:
-    st.image("assets/shop.jpeg", width=250)  # Resized sidebar image
+    st.image("assets/shop.jpeg", width=600)  # Resized sidebar image
     st.title("☕ Admin Dashboard")
     st.subheader("📌 Pages")
 
