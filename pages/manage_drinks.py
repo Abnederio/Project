@@ -10,7 +10,9 @@ from pydrive.drive import GoogleDrive
 from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-from googleapiclient.discovery import build
+
+
+
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="wide")
 
@@ -78,14 +80,9 @@ def train_and_update_model():
 
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
-    feature_importance_df = pd.DataFrame({
-    "feature": X_train.columns,
-    "importance": model.get_feature_importance()
-})
 
     joblib.dump(model, "catboost_model.pkl")
     joblib.dump(accuracy, "catboost_accuracy.pkl")
-    joblib.dump(feature_importance_df, "catboost_feature_importance.pkl")
 
     st.success(f"✅ Model retrained! New accuracy: {accuracy:.2%}")
 
@@ -185,8 +182,6 @@ with col2:
 
         # Upload new image if provided
         image_file = st.file_uploader("Upload a new image for the coffee", type=['jpg', 'jpeg', 'png'])
-        
-        drive_service = build("drive", "v3", credentials=creds)
 
         if st.button("Update Coffee"):
             # ✅ Rename the coffee in the DataFrame first
@@ -197,24 +192,13 @@ with col2:
                 new_caffeine_level, new_sweetness, new_drink_type, new_roast_level, new_milk_type, new_flavor_notes, new_bitterness_level, new_weather
             ]
 
-            # ✅ Handle Image Update
+            # Handle image update
             if image_file:
-                # Step 1: Find and delete the old image in Google Drive
-                query = f"'{FOLDER_ID}' in parents and name contains '{selected_coffee}' and trashed=false"
-                results = drive_service.files().list(q=query, fields="files(id, name)").execute()
-                files = results.get("files", [])
-
-                for file in files:
-                    drive_service.files().delete(fileId=file["id"]).execute()  # Delete old image
-
-                # Step 2: Upload the new image with the updated name
                 image_path = f"{new_name}.png"
                 with open(image_path, "wb") as f:
                     f.write(image_file.getbuffer())
-
-                # Upload new image and get the link
                 image_link = upload_image_to_drive(image_path, image_path)
-
+                
                 # ✅ Update the image link in the DataFrame using `new_name`
                 df.loc[df["Coffee Name"] == new_name, "Image"] = image_link
                 st.success("📸 Image updated successfully!")
@@ -230,7 +214,6 @@ with col2:
             train_and_update_model()
             st.success(f"✅ {new_name} updated successfully.")
             st.rerun()
-
 
 
 # 🗑 **Delete Coffee** in col3
