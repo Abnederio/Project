@@ -139,6 +139,7 @@ with col1:
     )
     if st.button("🏠 Go Back to Menu", use_container_width=True):
         st.session_state.page_selection = "about"  # Redirect to Home
+        st.switch_page("pages/menu.py")
 
 with col2:
     st.markdown(
