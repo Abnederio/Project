@@ -3,6 +3,8 @@ import pandas as pd
 import plotly.express as px
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
+import joblib
+from sklearn.metrics import accuracy_score
 
 # ✅ Set Page Configuration
 st.set_page_config(
@@ -188,8 +190,8 @@ elif st.session_state.page_selection == "machine_learning":
 
 elif st.session_state.page_selection == "prediction":
     st.header("👀 Prediction Accuracy")
-    model_accuracy = 0.94  # Replace with actual accuracy
-    st.success(f"✅ The model achieved **{model_accuracy * 100:.2f}%** accuracy.")
+    accuracy = joblib.load("catboost_accuracy.pkl")
+    st.success(f"✅ The model achieved **{accuracy * 100:.2f}%** accuracy.")
 
 # ✅ Navigation Buttons
 col1, col2 = st.columns(2)
