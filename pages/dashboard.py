@@ -38,6 +38,7 @@ def set_page_selection(page):
 
 # ✅ Sidebar Navigation
 with st.sidebar:
+    st.image("assets/shop.jpeg", use_column_width=True)  # Coffee shop image at the top
     st.title("☕ Admin Dashboard")
     st.subheader("📌 Pages")
 
@@ -51,9 +52,9 @@ with st.sidebar:
         "👀 Prediction": "prediction"
     }
 
-    # ✅ Sidebar Buttons
+    # ✅ Sidebar Buttons - Styled
     for label, key in pages.items():
-        if st.button(label, key=key):
+        if st.button(label, key=key, use_container_width=True):
             st.session_state.page_selection = key
 
     st.markdown("---")  # Divider
@@ -72,7 +73,7 @@ dataset = df
 
 # ✅ Page Logic (Switch Pages)
 if st.session_state.page_selection == "about":
-    st.image("assets/shop.jpeg", use_container_width=True)  # Large image at the top
+    st.image("assets/shop.jpeg", use_column_width=True)  # Large image at the top
     st.header("ℹ️ Welcome to Alex's Brew Haven ☕")
     st.write("""
     **Alex's Brew Haven** is a coffeehouse known for its **premium coffee** and **innovative flavors**.  
@@ -128,15 +129,23 @@ elif st.session_state.page_selection == "prediction":
 # ✅ Divider
 st.divider()
 
-# ✅ Navigation Buttons
+# ✅ Navigation Buttons - Styled
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button("🏠 Go Back to Menu"):
+    st.markdown(
+        '<style>div.stButton > button:first-child { width: 100%; background-color: #4CAF50; color: white; font-size: 16px; padding: 10px; border-radius: 5px; }</style>',
+        unsafe_allow_html=True
+    )
+    if st.button("🏠 Go Back to Menu", use_container_width=True):
         st.session_state.page_selection = "about"  # Redirect to Home
 
 with col2:
-    if st.button("🚪 Logout"):
+    st.markdown(
+        '<style>div.stButton > button:first-child { width: 100%; background-color: #d9534f; color: white; font-size: 16px; padding: 10px; border-radius: 5px; }</style>',
+        unsafe_allow_html=True
+    )
+    if st.button("🚪 Logout", use_container_width=True):
         st.session_state.token = None
         st.switch_page("pages/admin.py")
 
