@@ -147,7 +147,7 @@ dataset = df
 
 # ✅ Page Logic (Switch Pages)
 if st.session_state.page_selection == "about":
-    st.image("assets/shop.jpeg")  # Resized image
+    st.image("assets/shop.jpeg", use_container_width=True)  # Resized image
     st.header("ℹ️ Welcome to Alex's Brew Haven ☕")
     st.write("""
     **Alex's Brew Haven** is a coffeehouse known for its **premium coffee** and **innovative flavors**.  
