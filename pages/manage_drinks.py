@@ -171,7 +171,7 @@ with col2:
         coffee_data = df[df["Coffee Name"] == selected_coffee].iloc[0]
 
         # Get the current values for all features
-        new_name = st.text_input("Coffee Name", value=coffee_data["Coffee Name"])
+        #new_name = st.text_input("Coffee Name", value=coffee_data["Coffee Name"])
         new_caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Caffeine Level"]))
         new_sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Sweetness"]))
         new_drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'], index=['Frozen', 'Iced', 'Hot'].index(coffee_data["Type"]))
