@@ -13,68 +13,15 @@ from sklearn.metrics import accuracy_score
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="centered")
 # CSS
-# ✅ Custom CSS for a Premium Coffee-Themed UI
 st.markdown(
     """
     <style>
-        /* Background */
-        body {
-            background-color: #F8EDE3 !important;  /* Soft Latte */
-        }
-        .stApp {
-            background-color: #F8EDE3 !important;  /* Warm and inviting */
-        }
-
-        /* Sidebar */
-        section[data-testid="stSidebar"] {
-            background-color: #6D4C3D !important;  /* Deep Mocha */
-            color: white !important;
-        }
-
-        /* Button Styling */
-        div.stButton > button {
-            width: 100%;
-            font-size: 16px;
-            padding: 12px;
-            border-radius: 8px;
-            transition: 0.3s ease-in-out;
-            border: none;
-            font-weight: bold;
-        }
-
-        /* Caramel Button (Go Back) */
-        div.stButton > button:first-child {
-            background-color: #A67B5B;  /* Caramel */
-            color: white;
-        }
-        div.stButton > button:first-child:hover {
-            background-color: #8D6C4F;  /* Toasted Brown */
-            transform: scale(1.05);
-        }
-
-        /* Mocha Button (Admin/Logout) */
-        div.stButton > button:last-child {
-            background-color: #5E503F;  /* Dark Cocoa */
-            color: white;
-        }
-        div.stButton > button:last-child:hover {
-            background-color: #4A4032;  /* Richer Mocha */
-            transform: scale(1.05);
-        }
-
-        /* Headers & Text */
-        h1, h2, h3, h4, h5, h6 {
-            color: #3E2723 !important;  /* Roasted Coffee */
-        }
-        p, div {
-            color: #4E342E !important;  /* Dark Cocoa Text */
-        }
-
-        /* Dataset Table */
-        .stDataFrame {
-            background-color: #F0D9B5 !important;  /* Light Cappuccino */
-            color: #3E2723 !important;  /* Mocha text */
-        }
+    body {
+        background-color: #A27B5C;
+    }
+    .stApp {
+        background-color: #A27B5C; 
+    }
 
     </style>
     """,
