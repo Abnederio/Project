@@ -147,8 +147,14 @@ if st.button("🎯 Recommend Coffee"):
     image_link = get_image_url_from_drive(recommended_coffee)
 
     if image_link:
-        print(image_link)
-        st.image(image_link, caption=f"Your coffee: {recommended_coffee}")
+        st.markdown(
+            f"""
+            <div style="display: flex; justify-content: center; margin-top: 20px;">
+                <img src="{image_link}" width="400" style="border-radius: 12px;">
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
     else:
         st.warning("⚠️ No image available for this coffee.")
 
@@ -170,7 +176,7 @@ st.divider()
 # ✅ Sidebar Admin Button
 with st.sidebar:
     st.markdown('<p class="sidebar-title">🔑 Admin Access</p>', unsafe_allow_html=True)
-    if st.button("Go to Admin Dashboard"):
+    if st.button("Admin Login"):
         st.switch_page("pages/admin.py")
 
 
