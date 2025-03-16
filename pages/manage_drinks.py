@@ -161,7 +161,7 @@ with col1:
                 except Exception as e:
                     st.error(f"Error updating Google Sheets: {e}")
 
-# ✏️ **Update Coffee** in col2
+#Update Coffee
 with col2:
     st.markdown("### ✏️ Update Coffee")
     coffee_names = df["Coffee Name"].dropna().unique()
@@ -185,37 +185,37 @@ with col2:
         image_file = st.file_uploader("Upload a new image for the coffee", type=['jpg', 'jpeg', 'png'])
 
         if st.button("Update Coffee"):
-            # Update the coffee in the DataFrame
-            df.loc[df["Coffee Name"] == selected_coffee, ["Coffee Name", "Caffeine Level", "Sweetness", "Type", "Roast Level", "Milk Type", "Flavor Notes", "Bitterness Level", "Weather"]] = [new_name, new_caffeine_level, new_sweetness, new_drink_type, new_roast_level, new_milk_type, new_flavor_notes, new_bitterness_level, new_weather]
+            # ✅ Rename the coffee in the DataFrame first
             df.loc[df["Coffee Name"] == selected_coffee, "Coffee Name"] = new_name
+
+            # ✅ Now update the other attributes
+            df.loc[df["Coffee Name"] == new_name, ["Caffeine Level", "Sweetness", "Type", "Roast Level", "Milk Type", "Flavor Notes", "Bitterness Level", "Weather"]] = [
+                new_caffeine_level, new_sweetness, new_drink_type, new_roast_level, new_milk_type, new_flavor_notes, new_bitterness_level, new_weather
+            ]
+
             # Handle image update
             if image_file:
-                image_path = f"{new_name}.png"  # Use the name directly, without replacing spaces with underscores
+                image_path = f"{new_name}.png"
                 with open(image_path, "wb") as f:
                     f.write(image_file.getbuffer())
                 image_link = upload_image_to_drive(image_path, image_path)
                 
-                # Update the image link in the DataFrame
-                df.loc[df["Coffee Name"] == selected_coffee, "Image"] = image_link
-                
-               
+                # ✅ Update the image link in the DataFrame using `new_name`
+                df.loc[df["Coffee Name"] == new_name, "Image"] = image_link
                 st.success("📸 Image updated successfully!")
 
-            # Fetch the existing data in Google Sheets
+            # ✅ Fetch the existing data in Google Sheets
             existing_data = sheet.get_all_records()
 
-            # Iterate over all rows and update rows where the coffee name matches
-            for i, row in enumerate(existing_data, start=2):  # starting at 2 because Sheet rows start from 1
-                if row["Coffee Name"] == selected_coffee:
-                    # Prepare the updated row data to match the columns
-                    updated_row = df[df["Coffee Name"] == selected_coffee].iloc[0].values.tolist()
+            for i, row in enumerate(existing_data, start=2):
+                if row["Coffee Name"] == selected_coffee:  # Find old coffee name
+                    updated_row = df[df["Coffee Name"] == new_name].iloc[0].values.tolist()
+                    sheet.update(f'A{i}', [updated_row])  # Update Google Sheets row
 
-                    # Update the row in Google Sheets
-                    sheet.update(f'A{i}', [updated_row])  # Use f-string to reference the specific row
-                    
-            train_and_update_model()         
+            train_and_update_model()
             st.success(f"✅ {new_name} updated successfully.")
             st.rerun()
+
 
 # 🗑 **Delete Coffee** in col3
 with col3:
