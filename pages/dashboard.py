@@ -112,7 +112,7 @@ st.markdown(
 
 # ✅ Sidebar Navigation
 with st.sidebar:
-    st.image("assets/shop.jpeg", width=600)  # Resized sidebar image
+    st.image("assets/shop.jpeg", use_container_width=True, Height = 500)  # Resized sidebar image
     st.title("☕ Admin Dashboard")
     st.subheader("📌 Pages")
 
