@@ -1,11 +1,8 @@
 import streamlit as st
 import pandas as pd
-import altair as alt
 import plotly.express as px
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
 
 # ✅ Set Page Configuration
 st.set_page_config(
@@ -41,6 +38,7 @@ def set_page_selection(page):
 
 # ✅ Sidebar Navigation
 with st.sidebar:
+    st.image("assets/shop.jpg", use_column_width=True)  # Coffee shop image at the top
     st.title("☕ Admin Dashboard")
     st.subheader("📌 Pages")
 
@@ -59,6 +57,8 @@ with st.sidebar:
         if st.button(label, key=key):
             st.session_state.page_selection = key
 
+    st.markdown("---")  # Divider
+
     # ✅ Project Members Section
     st.subheader("👥 Members")
     st.markdown("""
@@ -73,10 +73,19 @@ dataset = df
 
 # ✅ Page Logic (Switch Pages)
 if st.session_state.page_selection == "about":
-    st.header("ℹ️ About")
+    st.image("assets/shop.jpg", use_column_width=True)  # Large image at the top
+    st.header("ℹ️ Welcome to Alex's Brew Haven ☕")
     st.write("""
-    **Alex's Brew Haven** is a coffeehouse, celebrated for its high-quality beverages and commitment to innovation.  
-    This application recommends drinks based on user preferences, providing a **seamless, customized ordering experience** while streamlining operations.  
+    **Alex's Brew Haven** is a coffeehouse known for its **premium coffee** and **innovative flavors**.  
+    This application enhances the customer experience by **recommending personalized drinks** based on preferences.  
+    """)
+    
+    st.markdown("""
+    ### **✨ Why Choose Us?**
+    - **🌱 Organic & Sustainable Coffee**
+    - **👨‍🔬 Expertly Crafted Recipes**
+    - **📲 Seamless & Smart Ordering**
+    - **🎯 AI-Powered Drink Recommendations**
     """)
 
 elif st.session_state.page_selection == "dataset":
@@ -87,7 +96,7 @@ elif st.session_state.page_selection == "dataset":
 
     st.subheader("📊 Coffee Type Distribution")
     pie_chart = px.pie(dataset, names="Coffee Name", title="Coffee Type Percentage")
-    st.plotly_chart(pie_chart)
+    st.plotly_chart(pie_chart, use_container_width=True)
 
 elif st.session_state.page_selection == "eda":
     st.header("📈 Exploratory Data Analysis (EDA)")
@@ -95,7 +104,7 @@ elif st.session_state.page_selection == "eda":
     
     selected_column = st.selectbox("Choose an Attribute:", dataset.columns)
     bar_chart = px.bar(dataset, x="Coffee Name", y=selected_column, title=f"Distribution of {selected_column}")
-    st.plotly_chart(bar_chart)
+    st.plotly_chart(bar_chart, use_container_width=True)
 
 elif st.session_state.page_selection == "data_cleaning":
     st.header("🧼 Data Cleaning & Pre-processing")
@@ -109,7 +118,7 @@ elif st.session_state.page_selection == "data_cleaning":
 
 elif st.session_state.page_selection == "machine_learning":
     st.header("🤖 Machine Learning")
-    st.write("Machine Learning Model Implementation Coming Soon...")
+    st.write("🚀 **Machine Learning Model Implementation Coming Soon...**")
 
 elif st.session_state.page_selection == "prediction":
     st.header("👀 Prediction Accuracy")
@@ -131,4 +140,5 @@ with col2:
     if st.button("🚪 Logout"):
         st.session_state.token = None
         st.switch_page("pages/admin.py")
+
 
