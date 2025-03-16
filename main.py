@@ -11,28 +11,65 @@ from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="centered")
-# CSS
+st.set_page_config(initial_sidebar_state="expanded", page_title="Coffee Recommender", layout="centered")
+
+# ✅ Sidebar Styling
 st.markdown(
     """
     <style>
-    body {
-        background-color: #A27B5C;
-    }
-    .stApp {
-        background-color: #A27B5C; 
-    }
-
+        body {
+            background-color: #A27B5C;
+        }
+        .stApp {
+            background-color: #A27B5C;
+        }
+        .recommend-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .recommend-button {
+            background-color: #8D6C4F;
+            color: white;
+            padding: 14px 28px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s ease-in-out;
+            margin-top: 20px;
+        }
+        .recommend-button:hover {
+            background-color: #754F44;
+            transform: scale(1.05);
+        }
+        /* Sidebar */
+        section[data-testid="stSidebar"] {
+            background-color: #6B4E3D;
+            color: white;
+        }
+        .sidebar-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .sidebar-button {
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+        }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-
 # ✅ Google Sheets Setup
 SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
 SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-CREDS_FILE = "civic-pulsar-453709-f7-10c1906e9ce5.json"  # Ensure this file is in the project directory
+CREDS_FILE = "civic-pulsar-453709-f7-10c1906e9ce5.json"
 
 # ✅ Authenticate Google Sheets
 creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
@@ -41,8 +78,6 @@ sheet = client.open_by_key(SHEET_ID).sheet1
 
 # ✅ Google Drive Setup (For Image Retrieval)
 FOLDER_ID = "1GtQVlpBSe71mvDk5fbkICqMdUuyfyGGn"
-
-# Authenticate with Google Drive API
 drive_service = build("drive", "v3", credentials=creds)
 
 def load_google_sheet():
@@ -92,14 +127,13 @@ def get_image_url_from_drive(coffee_name):
     for file in files:
         file_name = file['name'].lower().replace(" ", "").replace("_", "")
         if file_name.startswith(coffee_name_formatted) and file_name.endswith(('.png', '.jpg', '.jpeg')):
-            return f"https://drive.google.com/thumbnail?id={file['id']}&sz=w500"  # Resized URL
+            return f"https://drive.google.com/thumbnail?id={file['id']}&sz=w500"
 
     return None
 
 # 🎯 **User Input Section**
 st.markdown("#### ☕ Select Your Preferences")
 
-# 🏗 **Columns for Better Layout**
 col1, col2 = st.columns(2)
 
 with col1:
@@ -114,32 +148,16 @@ with col2:
     bitterness_level = st.selectbox('🏴 Bitterness Level:', ['Low', 'Medium', 'High'])
     weather = st.selectbox('🌡 Weather:', ['Hot', 'Cold'])
 
-st.divider()  
+st.divider()
 
 # 🌟 **Recommendation Section**
+st.markdown('<div class="recommend-container">', unsafe_allow_html=True)
 st.markdown("### ☕ AI Coffee Recommendation")
 
-if "recommended_coffee" not in st.session_state:
-    st.session_state.recommended_coffee = None
-
-# **Formatted Feature String**
-features = f"""
-- ☕ Caffeine Level: `{caffeine_level}`
-- 🍬 Sweetness: `{sweetness}`
-- ❄️ Drink Type: `{drink_type}`
-- 🔥 Roast Level: `{roast_level}`
-- 🥛 Milk Type: `{milk_type}`
-- 🍫 Flavor Notes: `{flavor_notes}`
-- 🏴 Bitterness Level: `{bitterness_level}`
-- 🌡 Weather: `{weather}`
-"""
-
-if st.button("🎯 Recommend Coffee"):
+if st.button("🎯 Recommend Coffee", key="recommend"):
     rfr_input_data = [[caffeine_level, sweetness, drink_type, roast_level, milk_type, flavor_notes, bitterness_level, weather]]
     rfr_prediction = model.predict(rfr_input_data)
-    
-    recommended_coffee = rfr_prediction[0] if isinstance(rfr_prediction, (list, np.ndarray)) else rfr_prediction  
-    recommended_coffee = str(recommended_coffee).strip("[]'")  
+    recommended_coffee = str(rfr_prediction[0]).strip("[]'")
 
     st.success(f"☕ **Your ideal coffee is: {recommended_coffee}**")
 
@@ -147,29 +165,46 @@ if st.button("🎯 Recommend Coffee"):
     image_link = get_image_url_from_drive(recommended_coffee)
 
     if image_link:
-        print(image_link)
-        st.image(image_link, caption=f"Your coffee: {recommended_coffee}")
+        st.markdown(
+            f"""
+            <div style="display: flex; justify-content: center; margin-top: 20px;">
+                <img src="{image_link}" width="400" style="border-radius: 12px;">
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
     else:
         st.warning("⚠️ No image available for this coffee.")
 
-    # ✅ Gemini AI Explanation
-    genai.configure(api_key="AIzaSyAXpLVdg1s1dpRj0-Crb7HYhr2xHvGUffg")
-    ai_model = genai.GenerativeModel("gemini-2.0-flash")
-    response = ai_model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features} make it like a true salesperson. Explain in 5 sentences.")
-    
-    explanation = response.text
+    # ✅ AI Explanation
+    prompt = f"""
+    Explain why '{recommended_coffee}' is the best match for the user based on:
+    - Caffeine Level: {caffeine_level}
+    - Sweetness: {sweetness}
+    - Drink Type: {drink_type}
+    - Roast Level: {roast_level}
+    - Milk Type: {milk_type}
+    - Flavor Notes: {flavor_notes}
+    - Bitterness Level: {bitterness_level}
+    - Weather: {weather}
+    """
 
-    if explanation:
-        st.markdown(f"#### 💡 Why this coffee?")
-        st.info(explanation)
-    else:
-        st.warning("🤖 AI couldn't generate an explanation. Please try again.")
+    response = genai.GenerativeModel("gemini-2.0-flash").generate_content(prompt)
+    explanation = response.text if response else "No explanation available."
+
+    st.markdown("#### 💡 Why this coffee?")
+    st.info(explanation)
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 st.divider()
 
-# ✅ Admin Button
-if st.button("🔑 Admin Login"):
-    st.switch_page("pages/admin.py")
+# ✅ Sidebar Admin Button
+with st.sidebar:
+    st.markdown('<p class="sidebar-title">🔑 Admin Access</p>', unsafe_allow_html=True)
+    if st.button("Go to Admin Dashboard"):
+        st.switch_page("pages/admin.py")
+
 
 
 
