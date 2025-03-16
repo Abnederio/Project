@@ -256,7 +256,7 @@ with col3:
 
                     for row in rows_to_delete:
                         sheet.delete_rows(row)
-                        st.write(f"Deleted row {row} for {delete_coffee}")
+                        
 
                     st.success(f"🗑 {delete_coffee} deleted successfully from Google Sheets!")
                     train_and_update_model()  # Retrain with the updated data
