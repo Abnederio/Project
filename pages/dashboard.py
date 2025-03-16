@@ -76,7 +76,7 @@ st.markdown(
 
         /* Red Button (Logout) */
         div.stButton > button:last-child {
-            background-color: #9C2C18;  /* Rich espresso red */
+            background-color: #C14438 ;  /* Rich espresso red */
             color: white;
         }
         div.stButton > button:last-child:hover {
