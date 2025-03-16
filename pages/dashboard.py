@@ -34,8 +34,8 @@ st.markdown(
 
 
 # Initialize session state if not set
-if 'page_selection' not in st.session_state:
-    st.session_state.page_selection = 'about'  # Default page
+#if 'page_selection' not in st.session_state:
+   # st.session_state.page_selection = 'about'  # Default page
     
 # ✅ Google Sheets Setup
 SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
