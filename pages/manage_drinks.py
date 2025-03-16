@@ -171,7 +171,7 @@ with col2:
         coffee_data = df[df["Coffee Name"] == selected_coffee].iloc[0]
 
         # Get the current values for all features
-        #new_name = st.text_input("Coffee Name", value=coffee_data["Coffee Name"])
+        new_name = st.text_input("Coffee Name", value=coffee_data["Coffee Name"])
         new_caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Caffeine Level"]))
         new_sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Sweetness"]))
         new_drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'], index=['Frozen', 'Iced', 'Hot'].index(coffee_data["Type"]))
@@ -187,7 +187,7 @@ with col2:
         if st.button("Update Coffee"):
             # Update the coffee in the DataFrame
             df.loc[df["Coffee Name"] == selected_coffee, ["Coffee Name", "Caffeine Level", "Sweetness", "Type", "Roast Level", "Milk Type", "Flavor Notes", "Bitterness Level", "Weather"]] = [new_name, new_caffeine_level, new_sweetness, new_drink_type, new_roast_level, new_milk_type, new_flavor_notes, new_bitterness_level, new_weather]
-
+            df.loc[df["Coffee Name"] == selected_coffee, "Coffee Name"] = new_name
             # Handle image update
             if image_file:
                 image_path = f"{new_name}.png"  # Use the name directly, without replacing spaces with underscores
@@ -256,7 +256,7 @@ with col3:
 
                     for row in rows_to_delete:
                         sheet.delete_rows(row)
-                        
+                        st.write(f"Deleted row {row} for {delete_coffee}")
 
                     st.success(f"🗑 {delete_coffee} deleted successfully from Google Sheets!")
                     train_and_update_model()  # Retrain with the updated data
