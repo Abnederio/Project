@@ -38,7 +38,7 @@ def set_page_selection(page):
 
 # ✅ Sidebar Navigation
 with st.sidebar:
-    st.image("assets/shop.jpeg", width=600)  # Coffee shop image at the top
+    st.image("assets/shop.jpeg", width=500)  # Coffee shop image at the top
     st.title("☕ Admin Dashboard")
     st.subheader("📌 Pages")
 
