@@ -38,7 +38,7 @@ def set_page_selection(page):
 
 # ✅ Sidebar Navigation
 with st.sidebar:
-    st.image("assets/shop.jpeg", use_container_width=True)  # Coffee shop image at the top
+    st.image("assets/shop.jpeg", width=600)  # Coffee shop image at the top
     st.title("☕ Admin Dashboard")
     st.subheader("📌 Pages")
 
@@ -122,7 +122,7 @@ elif st.session_state.page_selection == "machine_learning":
 
 elif st.session_state.page_selection == "prediction":
     st.header("👀 Prediction Accuracy")
-    model_accuracy = 0.98  # Replace with actual accuracy
+    model_accuracy = 0.94  # Replace with actual accuracy
     st.subheader("📊 Model Training Accuracy")
     st.success(f"✅ The model achieved **{model_accuracy * 100:.2f}%** accuracy on the training dataset.")
 
