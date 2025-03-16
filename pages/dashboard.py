@@ -9,7 +9,6 @@ st.set_page_config(
 import pandas as pd
 import altair as alt
 import plotly.express as px
-from pages import menu
 import google.generativeai as genai
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
