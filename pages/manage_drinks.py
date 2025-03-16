@@ -73,7 +73,7 @@ def train_and_update_model():
 
     df[features] = df[features].fillna("Unknown")
 
-    X_train, X_test, y_train, y_test = train_test_split(df[features], df[target], test_size=0.3, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(df[features], df[target], test_size=0.3, random_state=42, stratify=df[target])
 
     model = CatBoostClassifier(iterations=150, learning_rate=0.3, depth=6, verbose=0)
     model.fit(X_train, y_train, cat_features=features)

@@ -60,7 +60,7 @@ X.fillna("Unknown", inplace=True)
 y.fillna("Unknown", inplace=True)
 
 cat_features = list(range(X.shape[1]))
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
 
 MODEL_PATH = "catboost_model.pkl"
 ACCURACY_PATH = "catboost_accuracy.pkl"
