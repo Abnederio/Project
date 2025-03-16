@@ -77,8 +77,6 @@ else:
     joblib.dump(model, MODEL_PATH)
     joblib.dump(accuracy, ACCURACY_PATH)
 
-st.markdown(f"**✅ Model Accuracy:** `{accuracy:.2%}`")
-
 st.image("Header.png", width=800)
 st.header("☕ Alex's Coffee Haven: AI Coffee Recommender")
 st.divider()
