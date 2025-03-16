@@ -38,7 +38,7 @@ def set_page_selection(page):
 
 # ✅ Sidebar Navigation
 with st.sidebar:
-    st.image("assets/shop.jpeg", use_column_width=True)  # Coffee shop image at the top
+    st.image("assets/shop.jpeg", use_container_width=True)  # Coffee shop image at the top
     st.title("☕ Admin Dashboard")
     st.subheader("📌 Pages")
 
@@ -73,7 +73,7 @@ dataset = df
 
 # ✅ Page Logic (Switch Pages)
 if st.session_state.page_selection == "about":
-    st.image("assets/shop.jpeg", use_column_width=True)  # Large image at the top
+    st.image("assets/shop.jpeg", use_container_width=True)  # Large image at the top
     st.header("ℹ️ Welcome to Alex's Brew Haven ☕")
     st.write("""
     **Alex's Brew Haven** is a coffeehouse known for its **premium coffee** and **innovative flavors**.  
