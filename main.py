@@ -140,7 +140,7 @@ st.markdown(
     """
     <style>
     div[data-baseweb="select"] > div {
-        color: gray !important;
+        color: white !important;
     }
     </style>
     """,
