@@ -114,22 +114,39 @@ def get_image_url_from_drive(coffee_name):
 # 🎯 **User Input Section**
 st.markdown("#### ☕ Select Your Preferences")
 
+# Function to style placeholder text
+def format_placeholder(option):
+    return "🔽 Select an option" if option == "Select an option" else option
+
 # 🏗 **Columns for Better Layout**
 col1, col2 = st.columns(2)
 
 with col1:
-    caffeine_level = st.selectbox('☕ Caffeine Level:', ['Select an option', 'Low', 'Medium', 'High'])
-    sweetness = st.selectbox('🍬 Sweetness:', ['Select an option', 'Low', 'Medium', 'High'])
-    drink_type = st.selectbox('❄️ Drink Type:', ['Select an option', 'Frozen', 'Iced', 'Hot'])
-    roast_level = st.selectbox('🔥 Roast Level:', ['Select an option', 'Medium', 'None', 'Dark'])
+    caffeine_level = st.selectbox('☕ Caffeine Level:', ['Select an option', 'Low', 'Medium', 'High'], format_func=format_placeholder)
+    sweetness = st.selectbox('🍬 Sweetness:', ['Select an option', 'Low', 'Medium', 'High'], format_func=format_placeholder)
+    drink_type = st.selectbox('❄️ Drink Type:', ['Select an option', 'Frozen', 'Iced', 'Hot'], format_func=format_placeholder)
+    roast_level = st.selectbox('🔥 Roast Level:', ['Select an option', 'Medium', 'None', 'Dark'], format_func=format_placeholder)
 
 with col2:
     milk_type = 'Dairy' if st.toggle("🥛 Do you want milk?") else 'No Dairy'
-    flavor_notes = st.selectbox('🍫 Flavor Notes:', ['Select an option', 'Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'])
-    bitterness_level = st.selectbox('🏴 Bitterness Level:', ['Select an option', 'Low', 'Medium', 'High'])
-    weather = st.selectbox('🌡 Weather:', ['Select an option', 'Hot', 'Cold'])
+    flavor_notes = st.selectbox('🍫 Flavor Notes:', ['Select an option', 'Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'], format_func=format_placeholder)
+    bitterness_level = st.selectbox('🏴 Bitterness Level:', ['Select an option', 'Low', 'Medium', 'High'], format_func=format_placeholder)
+    weather = st.selectbox('🌡 Weather:', ['Select an option', 'Hot', 'Cold'], format_func=format_placeholder)
 
 st.divider()
+
+# Custom CSS to make placeholder text gray
+st.markdown(
+    """
+    <style>
+    div[data-baseweb="select"] > div {
+        color: gray !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # 🌟 **Recommendation Section**
 st.markdown("### ☕ AI Coffee Recommendation")
