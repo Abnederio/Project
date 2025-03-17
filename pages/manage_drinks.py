@@ -124,6 +124,8 @@ st.divider()
 
 # ✅ Delete Coffee Function
 def delete_coffee(delete_coffee):
+    global df
+    
     # Check if image exists
     coffee_data = df[df["Coffee Name"] == delete_coffee].iloc[0]
     image_link = coffee_data.get("Image", None)
@@ -137,7 +139,7 @@ def delete_coffee(delete_coffee):
             st.error(f"Error deleting image from Google Drive: {e}")
 
     # Remove from DataFrame
-    global df
+    
     df = df[df["Coffee Name"] != delete_coffee]
 
     # Remove from Google Sheets
