@@ -148,7 +148,7 @@ with st.form("add_coffee"):
             else:
                 image_link = None
 
-            new_entry = [[name, caffeine_level, sweetness, drink_type, roast_level, milk_type, flavor_notes, bitterness_level, weather, image_link] for _ in range(10)]
+            new_entry = [[name, caffeine_level, sweetness, drink_type, roast_level, milk_type, flavor_notes, bitterness_level, weather] for _ in range(10)]
             sheet.append_rows(new_entry)
 
             st.success(f"✅ {name} added successfully!")
