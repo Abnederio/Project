@@ -116,7 +116,7 @@ st.markdown("#### ☕ Select Your Preferences")
 
 # Function to style placeholder text
 def format_placeholder(option):
-    return "🔽 Select an option" if option == "Select an option" else option
+    return "Select an option" if option == "Select an option" else option
 
 # 🏗 **Columns for Better Layout**
 col1, col2 = st.columns(2)
