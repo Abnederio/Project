@@ -4,7 +4,6 @@ import os
 import joblib
 import numpy as np
 import google.generativeai as genai
-import json
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
 from googleapiclient.discovery import build
@@ -13,8 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="centered")
-
-# ✅ Apply Custom CSS
+# CSS
 st.markdown(
     """
     <style>
@@ -24,36 +22,32 @@ st.markdown(
     .stApp {
         background-color: #A27B5C; 
     }
+
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# ✅ Load Google API Credentials Securely
-google_creds_json = os.getenv("GOOGLE_CREDENTIALS")
 
-if google_creds_json:
-    google_creds = json.loads(google_creds_json)
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(
-        google_creds, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.file"]
-    )
-else:
-    raise ValueError("Google API credentials not found! Make sure you set up GitHub Secrets correctly.")
+# ✅ Load Google API Credentials Securely (from Streamlit Secrets)
+if "GOOGLE_CREDENTIALS" not in st.secrets:
+    st.error("❌ GOOGLE_CREDENTIALS not found! Set up secrets in Streamlit Cloud.")
+    st.stop()
+
+google_creds = json.loads(st.secrets["GOOGLE_CREDENTIALS"])
+creds = ServiceAccountCredentials.from_json_keyfile_dict(
+    google_creds, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.file"]
+)
 
 # ✅ Google Sheets Setup
 SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
-
-# ✅ Authenticate Google Sheets
 client = gspread.authorize(creds)
 sheet = client.open_by_key(SHEET_ID).sheet1
 
 # ✅ Google Drive Setup (For Image Retrieval)
 FOLDER_ID = "1GtQVlpBSe71mvDk5fbkICqMdUuyfyGGn"
-
-# ✅ Authenticate with Google Drive API
 drive_service = build("drive", "v3", credentials=creds)
 
-# ✅ Load Coffee Data from Google Sheets
 def load_google_sheet():
     """Load coffee data from Google Sheets."""
     data = sheet.get_all_records()
@@ -61,7 +55,7 @@ def load_google_sheet():
 
 df = load_google_sheet()
 
-# ✅ Prepare Dataset for Model Training
+# ✅ Prepare Dataset for Model
 X = df.drop(columns=['Coffee Name'])
 y = df['Coffee Name']
 
@@ -69,7 +63,7 @@ X.fillna("Unknown", inplace=True)
 y.fillna("Unknown", inplace=True)
 
 cat_features = list(range(X.shape[1]))
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
 
 MODEL_PATH = "catboost_model.pkl"
 ACCURACY_PATH = "catboost_accuracy.pkl"
@@ -156,18 +150,27 @@ if st.button("🎯 Recommend Coffee"):
     image_link = get_image_url_from_drive(recommended_coffee)
 
     if image_link:
-        st.markdown(f'<div style="display: flex; justify-content: center; margin-top: 20px;"><img src="{image_link}" width="400" style="border-radius: 12px;"></div>', unsafe_allow_html=True)
+        st.markdown(
+            f"""
+            <div style="display: flex; justify-content: center; margin-top: 20px;">
+                <img src="{image_link}" width="400" style="border-radius: 12px;">
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
     else:
         st.warning("⚠️ No image available for this coffee.")
 
     # ✅ Gemini AI Explanation
     genai.configure(api_key="AIzaSyAXpLVdg1s1dpRj0-Crb7HYhr2xHvGUffg")
     ai_model = genai.GenerativeModel("gemini-2.0-flash")
-    response = ai_model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features} in a persuasive, salesperson-like manner.")
+    response = ai_model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features} make it like a true salesperson. Explain in 5 sentences.")
+    
+    explanation = response.text
 
-    if response and response.text:
-        st.markdown("#### 💡 Why this coffee?")
-        st.info(response.text)
+    if explanation:
+        st.markdown(f"#### 💡 Why this coffee?")
+        st.info(explanation)
     else:
         st.warning("🤖 AI couldn't generate an explanation. Please try again.")
 
@@ -178,7 +181,6 @@ with st.sidebar:
     st.markdown('<p class="sidebar-title">🔑 Admin Access</p>', unsafe_allow_html=True)
     if st.button("Admin Login"):
         st.switch_page("pages/admin.py")
-
 
 
 
