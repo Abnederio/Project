@@ -5,12 +5,10 @@ import joblib
 import numpy as np
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
+from googleapiclient.discovery import build
 from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-from googleapiclient.discovery import build
 
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="wide")
@@ -18,14 +16,14 @@ st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recomme
 if 'token' not in st.session_state or st.session_state.token is None:
     st.switch_page("pages/admin.py") 
 
-# ✅ Load Google API Credentials Securely (from Streamlit Secrets)
+# ✅ Load Google API Credentials Securely
 if "GOOGLE_CREDENTIALS" not in st.secrets:
     st.error("❌ GOOGLE_CREDENTIALS not found! Set up secrets in Streamlit Cloud.")
     st.stop()
 
 google_creds = st.secrets["GOOGLE_CREDENTIALS"] 
 creds = ServiceAccountCredentials.from_json_keyfile_dict(
-    google_creds, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.file"]
+    google_creds, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
 )
 
 # ✅ Google Sheets Setup
@@ -33,42 +31,63 @@ SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
 client = gspread.authorize(creds)
 sheet = client.open_by_key(SHEET_ID).sheet1
 
-# ✅ Google Drive Setup (For Image Retrieval)
+# ✅ Google Drive Setup
 FOLDER_ID = "1GNiAikLM4DAF81mrps1a6Ri2tQZGEqHi"
 drive_service = build("drive", "v3", credentials=creds)
 
-def authenticate_drive():
-    google_creds = st.secrets["GOOGLE_CREDENTIALS"]
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(
-        google_creds, ["https://www.googleapis.com/auth/drive"]
-    )
-    gauth = GoogleAuth()
-    gauth.credentials = creds
-    return GoogleDrive(gauth)
 
+# ✅ Upload Image to Google Drive
 def upload_image_to_drive(image_path, image_name):
-    drive = authenticate_drive()
+    file_metadata = {
+        "name": image_name,
+        "parents": [FOLDER_ID]
+    }
+    media = {"media_body": image_path}
+    
+    file_drive = drive_service.files().create(
+        body=file_metadata,
+        media_body=media,
+        fields="id"
+    ).execute()
 
-    # ✅ Upload file to the specific folder
-    file_drive = drive.CreateFile({'title': image_name, 'parents': [{'id': FOLDER_ID}]})
-    file_drive.SetContentFile(image_path)
-    file_drive.Upload()
+    # ✅ Make file public
+    drive_service.permissions().create(
+        fileId=file_drive["id"],
+        body={"type": "anyone", "role": "reader"}
+    ).execute()
 
-    # ✅ Make the file public
-    file_drive.InsertPermission({'type': 'anyone', 'value': 'anyone', 'role': 'reader'})
+    # ✅ Return direct image link
+    return f"https://drive.google.com/uc?id={file_drive['id']}"
 
-    # ✅ Get the direct image link
-    image_id = file_drive['id']
-    image_link = f"https://drive.google.com/uc?id={image_id}"  # Direct image link
 
-    return image_link
+# ✅ Retrieve Image URL from Google Drive
+def get_image_url_from_drive(coffee_name):
+    query = f"'{FOLDER_ID}' in parents and trashed=false"
+    results = drive_service.files().list(q=query, fields="files(id, name)").execute()
+    files = results.get("files", [])
 
-# 🔹 Load Data from Google Sheets
+    print("🔍 Retrieved Files from Google Drive:", [file["name"] for file in files])
+
+    coffee_name_formatted = coffee_name.lower().strip().replace(" ", "").replace("_", "")
+
+    for file in files:
+        file_name = file["name"].lower().strip().replace(" ", "").replace("_", "")
+
+        if coffee_name_formatted in file_name:  # ✅ Flexible matching
+            image_url = f"https://drive.google.com/thumbnail?id={file['id']}&sz=w500"
+            print(f"✅ Matched File: {file['name']} -> {image_url}")
+            return image_url
+
+    print("⚠️ No matching file found for:", coffee_name)
+    return None
+
+
+# ✅ Load Data from Google Sheets
 def load_google_sheet():
     data = sheet.get_all_records()
     return pd.DataFrame(data)
 
-# 🔹 Train & Update Model
+# ✅ Train & Update Model
 def train_and_update_model():
     st.info("🔄 Retraining the model...")
 
@@ -94,202 +113,62 @@ def train_and_update_model():
 
     st.success(f"✅ Model retrained! New accuracy: {accuracy:.2%}")
 
+
 df = load_google_sheet()
 
-# 🔹 Convert Image URLs into Clickable Images
-def image_formatter(url):
-    return f'<img src="{url}" width="100">'
-
-# 🔹 Show Dataframe with Images
+# ✅ Show Coffee Menu
 st.markdown("### ☕ Current Coffee Menu")
 st.dataframe(df, height=500)
 
 st.divider()
 
-# 🎨 **Columns for Better Layout**
-col1, col2, col3 = st.columns([2, 2, 1])
+# ✅ Delete Coffee Function
+def delete_coffee(delete_coffee):
+    # Check if image exists
+    coffee_data = df[df["Coffee Name"] == delete_coffee].iloc[0]
+    image_link = coffee_data.get("Image", None)
 
-# ➕ **Add Coffee** in col1
-with col1:
-    with st.form("add_coffee"):
-        st.markdown("### ➕ Add New Coffee")
+    if image_link:
+        image_id = image_link.split("=")[-1]  # Extract image ID
+        try:
+            drive_service.files().delete(fileId=image_id).execute()
+            st.success(f"🗑 Image for {delete_coffee} deleted successfully from Google Drive!")
+        except Exception as e:
+            st.error(f"Error deleting image from Google Drive: {e}")
 
-        name = st.text_input("Coffee Name", placeholder="Enter coffee name...").strip()
-        caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'])
-        sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'])
-        drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'])
-        roast_level = st.selectbox('Roast Level:', ['Medium', 'None', 'Dark'])
-        milk_type = 'Dairy' if st.toggle("Do you want milk?") else 'No Dairy'
-        flavor_notes = st.selectbox('Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'])
-        bitterness_level = st.selectbox('Bitterness Level:', ['Low', 'Medium', 'High'])
-        weather = st.selectbox('Weather:', ['Hot', 'Cold'])
+    # Remove from DataFrame
+    global df
+    df = df[df["Coffee Name"] != delete_coffee]
 
-        image_file = st.file_uploader("Upload an image for the coffee", type=['jpg', 'jpeg', 'png'])
+    # Remove from Google Sheets
+    try:
+        existing_data = sheet.get_all_records()
+        rows_to_delete = [i + 2 for i, row in enumerate(existing_data) if row["Coffee Name"] == delete_coffee]
 
-        submit = st.form_submit_button("Add Coffee")
+        if rows_to_delete:
+            rows_to_delete.sort(reverse=True)
+            for row in rows_to_delete:
+                sheet.delete_rows(row)
+                st.write(f"Deleted row {row} for {delete_coffee}")
 
-        if submit:
-            if not name:
-                st.error("❌ Coffee Name is required!")
-            elif name in df["Coffee Name"].values:
-                st.error("⚠️ Coffee already exists!")
-            else:
-                image_path = f"{name}.png"  # Use the coffee name for the image path
-                image_link = f"{name}.png"
-
-                if image_file:
-                    with open(image_path, "wb") as f:
-                        f.write(image_file.getbuffer())
-                    image_link = upload_image_to_drive(image_path, image_path)
-                    st.success("📸 Image uploaded successfully!")
-
-                # Create the new coffee entry as a DataFrame
-                new_entry = pd.DataFrame([{
-                    "Coffee Name": name,
-                    "Caffeine Level": caffeine_level,
-                    "Sweetness": sweetness,
-                    "Type": drink_type,
-                    "Roast Level": roast_level,
-                    "Milk Type": milk_type,
-                    "Flavor Notes": flavor_notes,
-                    "Bitterness Level": bitterness_level,
-                    "Weather": weather,
-                }] * 10)
-
-                try:
-                    # Convert the new coffee entry to a list of lists (to match the structure expected by Google Sheets API)
-                    new_entry_list = new_entry.values.tolist()
-                    # Append only the new rows to Google Sheets
-                    sheet.append_rows(new_entry_list, value_input_option='RAW')
-                    st.success("Google Sheets updated successfully!")
-                    train_and_update_model()
-                    st.success(f"☕ {name} added successfully!")
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Error updating Google Sheets: {e}")
-
-#Update Coffee
-with col2:
-    st.markdown("### ✏️ Update Coffee")
-    coffee_names = df["Coffee Name"].dropna().unique()
-    selected_coffee = st.selectbox("Select coffee to update:", coffee_names)
-
-    if selected_coffee:
-        coffee_data = df[df["Coffee Name"] == selected_coffee].iloc[0]
-
-        # Get the current values for all features
-        new_name = st.text_input("Coffee Name", value=coffee_data["Coffee Name"])
-        new_caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Caffeine Level"]))
-        new_sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Sweetness"]))
-        new_drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'], index=['Frozen', 'Iced', 'Hot'].index(coffee_data["Type"]))
-        new_roast_level = st.selectbox('Roast Level:', ['Medium', 'None', 'Dark'], index=['Medium', 'None', 'Dark'].index(coffee_data["Roast Level"]))
-        new_milk_type = 'Dairy' if coffee_data["Milk Type"] == "Dairy" else 'No Dairy'
-        new_flavor_notes = st.selectbox('Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'], index=['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'].index(coffee_data["Flavor Notes"]))
-        new_bitterness_level = st.selectbox('Bitterness Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Bitterness Level"]))
-        new_weather = st.selectbox('Weather:', ['Hot', 'Cold'], index=['Hot', 'Cold'].index(coffee_data["Weather"]))
-
-        # Upload new image if provided
-        image_file = st.file_uploader("Upload a new image for the coffee", type=['jpg', 'jpeg', 'png'])
-
-        if st.button("Update Coffee"):
-            # ✅ Rename the coffee in the DataFrame first
-            df.loc[df["Coffee Name"] == selected_coffee, "Coffee Name"] = new_name
-
-            # ✅ Now update the other attributes
-            df.loc[df["Coffee Name"] == new_name, ["Caffeine Level", "Sweetness", "Type", "Roast Level", "Milk Type", "Flavor Notes", "Bitterness Level", "Weather"]] = [
-                new_caffeine_level, new_sweetness, new_drink_type, new_roast_level, new_milk_type, new_flavor_notes, new_bitterness_level, new_weather
-            ]
-
-            # Handle image update
-            if image_file:
-                image_path = f"{new_name}.png"
-                with open(image_path, "wb") as f:
-                    f.write(image_file.getbuffer())
-                image_link = upload_image_to_drive(image_path, image_path)
-                
-                # ✅ Update the image link in the DataFrame using `new_name`
-                df.loc[df["Coffee Name"] == new_name, "Image"] = image_link
-                st.success("📸 Image updated successfully!")
-
-            # ✅ Fetch the existing data in Google Sheets
-            existing_data = sheet.get_all_records()
-
-            for i, row in enumerate(existing_data, start=2):
-                if row["Coffee Name"] == selected_coffee:  # Find old coffee name
-                    updated_row = df[df["Coffee Name"] == new_name].iloc[0].values.tolist()
-                    sheet.update(f'A{i}', [updated_row])  # Update Google Sheets row
-
+            st.success(f"🗑 {delete_coffee} deleted successfully from Google Sheets!")
             train_and_update_model()
-            st.success(f"✅ {new_name} updated successfully.")
             st.rerun()
-
-
-# 🗑 **Delete Coffee** in col3
-with col3:
-    st.markdown("### 🗑 Delete Coffee")
-    delete_coffee = st.selectbox("Select coffee to delete:", df["Coffee Name"].dropna().unique())
-
-    if st.button("Delete Coffee"):
-        if delete_coffee:
-            # Get the image link for the selected coffee to delete from Google Drive
-            coffee_data = df[df["Coffee Name"] == delete_coffee].iloc[0]
-            image_link = coffee_data["Image"] if "Image" in coffee_data else None
-
-            if image_link:
-                # Extract the image ID from the link
-                image_id = image_link.split('=')[-1]
-                drive = authenticate_drive()
-
-                # Delete the image from Google Drive
-                try:
-                    file_drive = drive.CreateFile({'id': image_id})
-                    file_drive.Delete()
-                    st.success(f"🗑 Image for {delete_coffee} deleted successfully from Google Drive!")
-                except Exception as e:
-                    st.error(f"Error deleting image from Google Drive: {e}")
-
-            # Remove the coffee from the DataFrame
-            df = df[df["Coffee Name"] != delete_coffee]
-
-            # ✅ Move Google Sheets deletion logic outside of the image deletion block
-            try:
-                existing_data = sheet.get_all_records()
-
-                # Find all rows to delete
-                rows_to_delete = [i + 2 for i, row in enumerate(existing_data) if row["Coffee Name"] == delete_coffee]
-
-                if rows_to_delete:
-                    rows_to_delete.sort(reverse=True)  # Delete from bottom to top to avoid shifting issues
-
-                    for row in rows_to_delete:
-                        sheet.delete_rows(row)
-                        st.write(f"Deleted row {row} for {delete_coffee}")
-
-                    st.success(f"🗑 {delete_coffee} deleted successfully from Google Sheets!")
-                    train_and_update_model()  # Retrain with the updated data
-                    st.rerun()
-                else:
-                    st.error("❌ Coffee not found in Google Sheets.")
-
-            except Exception as e:
-                st.error(f"Error updating Google Sheets: {e}")
-
         else:
-            st.error("❌ Please select a coffee to delete.")
+            st.error("❌ Coffee not found in Google Sheets.")
 
-st.divider()
+    except Exception as e:
+        st.error(f"Error updating Google Sheets: {e}")
 
-# Navigation Buttons
-col1, col2 = st.columns(2)
+# ✅ Sidebar Navigation
+st.sidebar.markdown("### 🔧 Admin Panel")
+if st.sidebar.button("🏠 Back to Menu"):
+    st.switch_page("pages/menu.py")
+if st.sidebar.button("🚪 Logout"):
+    st.session_state.token = None
+    st.switch_page("pages/admin.py")
 
-with col1:
-    if st.button("🏠 Go Back to Menu"):
-        st.switch_page("pages/menu.py")
 
-with col2:
-    if st.button("🚪 Logout"):
-        st.session_state.token = None
-        st.switch_page("pages/admin.py")
 
 
 

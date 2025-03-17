@@ -37,8 +37,9 @@ if "GOOGLE_CREDENTIALS" not in st.secrets:
     st.stop()
 
 google_creds = st.secrets["GOOGLE_CREDENTIALS"] 
+print(st.secrets["GOOGLE_CREDENTIALS"]["client_email"])
 creds = ServiceAccountCredentials.from_json_keyfile_dict(
-    google_creds, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.file"]
+    google_creds, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
 )
 
 # ✅ Google Sheets Setup
@@ -94,13 +95,19 @@ def get_image_url_from_drive(coffee_name):
     results = drive_service.files().list(q=query, fields="files(id, name)").execute()
     files = results.get("files", [])
 
-    coffee_name_formatted = coffee_name.lower().replace(" ", "").replace("_", "")
+    print("🔍 Retrieved Files from Google Drive:", [file['name'] for file in files])
+
+    coffee_name_formatted = coffee_name.lower().strip().replace(" ", "").replace("_", "")
 
     for file in files:
-        file_name = file['name'].lower().replace(" ", "").replace("_", "")
-        if file_name.startswith(coffee_name_formatted) and file_name.endswith(('.png', '.jpg', '.jpeg')):
-            return f"https://drive.google.com/thumbnail?id={file['id']}&sz=w500"  # Resized URL
+        file_name = file['name'].lower().strip().replace(" ", "").replace("_", "")
+        
+        if coffee_name_formatted in file_name:  # ✅ Looser match
+            image_url = f"https://drive.google.com/thumbnail?id={file['id']}&sz=w500"
+            print(f"✅ Matched File: {file['name']} -> {image_url}")
+            return image_url
 
+    print("⚠️ No matching file found for:", coffee_name)
     return None
 
 
@@ -157,8 +164,15 @@ if st.button("🎯 Recommend Coffee"):
 
     if image_link:
         response = requests.get(image_link)
-        st.image(response.content, width=500)  # Adjust the width as needed
+
+        # Check if response is an image
+        if "image" not in response.headers.get("Content-Type", ""):
+            st.error("🚨 Error: The image is not valid! Google Drive may be blocking access.")
+            st.write(f"[View Image in Drive]({image_link})")
+        else:
+            st.image(response.content, width=500)
     else:
+        print("Image URL:", image_link)
         st.warning("⚠️ No image available for this coffee.")
 
     # ✅ Gemini AI Explanation
