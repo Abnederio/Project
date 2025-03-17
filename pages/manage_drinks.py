@@ -195,7 +195,9 @@ if selected_coffee:
 
 # 🎯 **Delete Coffee**
 st.markdown("### 🗑️ Delete Coffee")
+
 delete_coffee = st.selectbox("Select coffee to delete:", df["Coffee Name"].dropna().unique())
+
 if st.button("Delete Coffee"):
     # ✅ Fetch data from Google Sheets
     existing_data = sheet.get_all_records()
@@ -214,8 +216,12 @@ if st.button("Delete Coffee"):
 
             # ✅ Try to remove the image from Google Drive
             image_link = get_image_url_from_drive(delete_coffee)
+
             if image_link:
-                image_id = image_link.split("id=")[-1]  # Extract Image ID
+                # ✅ Correctly extract the file ID
+                image_id = image_link.split("id=")[-1].split("&")[0]  # Only take the ID before "&"
+
+                # ✅ Delete the file using the correct ID
                 drive_service.files().delete(fileId=image_id).execute()
                 st.success(f"🗑 Image for {delete_coffee} deleted successfully from Google Drive!")
 
@@ -228,8 +234,6 @@ if st.button("Delete Coffee"):
 
     else:
         st.error("❌ Coffee not found in Google Sheets.")
-
-
 
 st.divider()
 
