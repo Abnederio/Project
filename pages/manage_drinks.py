@@ -38,7 +38,10 @@ FOLDER_ID = "1GNiAikLM4DAF81mrps1a6Ri2tQZGEqHi"
 drive_service = build("drive", "v3", credentials=creds)
 
 def authenticate_drive():
-    creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
+    google_creds = st.secrets["GOOGLE_CREDENTIALS"]
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(
+        google_creds, ["https://www.googleapis.com/auth/drive"]
+    )
     gauth = GoogleAuth()
     gauth.credentials = creds
     return GoogleDrive(gauth)
