@@ -192,6 +192,7 @@ if selected_coffee:
         
 
 # 🎯 **Delete Coffee**
+st.markdown("### 🗑️ Delete Coffee")
 delete_coffee = st.selectbox("Select coffee to delete:", df["Coffee Name"].dropna().unique())
 if st.button("Delete Coffee"):
     delete_coffee(delete_coffee)
