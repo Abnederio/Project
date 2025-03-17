@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import json
 from fuzzywuzzy import fuzz
+import requests
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="centered")
 # CSS
@@ -164,29 +165,17 @@ if st.button("🎯 Recommend Coffee"):
     image_link = get_image_url_from_drive(recommended_coffee)
 
     if image_link:
-        st.image(image_link, width=400)  # Adjust the width as needed
+        response = requests.get(image_link)
+        st.image(response.content, width=500)  # Adjust the width as needed
     else:
         st.warning("⚠️ No image available for this coffee.")
 
     # ✅ Gemini AI Explanation
     genai.configure(api_key="AIzaSyAXpLVdg1s1dpRj0-Crb7HYhr2xHvGUffg")
     ai_model = genai.GenerativeModel("gemini-2.0-flash")
-    response = ai_model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features} make it like a true salesperson. Explain in 5 sentences.")
+    response2 = ai_model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features} make it like a true salesperson. Explain in 5 sentences.")
     
-    explanation = response.text
-
-    if explanation:
-        st.markdown(f"#### 💡 Why this coffee?")
-        st.info(explanation)
-    else:
-        st.warning("🤖 AI couldn't generate an explanation. Please try again.")
-
-    # ✅ Gemini AI Explanation
-    genai.configure(api_key="AIzaSyAXpLVdg1s1dpRj0-Crb7HYhr2xHvGUffg")
-    ai_model = genai.GenerativeModel("gemini-2.0-flash")
-    response = ai_model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features} make it like a true salesperson. Explain in 5 sentences.")
-    
-    explanation = response.text
+    explanation = response2.text
 
     if explanation:
         st.markdown(f"#### 💡 Why this coffee?")
