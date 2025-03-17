@@ -177,21 +177,31 @@ if selected_coffee:
     image_file = st.file_uploader("Upload a new image for the coffee", type=['jpg', 'jpeg', 'png'])
 
     if st.button("Update Coffee"):
-        df.loc[df["Coffee Name"] == selected_coffee, ["Coffee Name", "Caffeine Level", "Sweetness", "Type", "Roast Level", "Milk Type", "Flavor Notes", "Bitterness Level", "Weather"]] = [
-            new_name, new_caffeine_level, new_sweetness, new_drink_type, new_roast_level, new_milk_type, new_flavor_notes, new_bitterness_level, new_weather
-        ]
+        try:
+            # ✅ Fetch the existing data in Google Sheets
+            existing_data = sheet.get_all_records()
 
-        if image_file:
-            image_path = f"{new_name}.png"
-            with open(image_path, "wb") as f:
-                f.write(image_file.getbuffer())
-            image_link = upload_image_to_drive(image_path, new_name)
-            df.loc[df["Coffee Name"] == new_name, "Image"] = image_link
+            for i, row in enumerate(existing_data, start=2):
+                if row["Coffee Name"] == selected_coffee:  # Find old coffee name
+                    updated_row = [new_name, new_caffeine_level, new_sweetness, new_drink_type, new_roast_level,
+                                   new_milk_type, new_flavor_notes, new_bitterness_level, new_weather]
+                    sheet.update(f'A{i}', [updated_row])  # ✅ Update Google Sheets row
 
-        train_and_update_model()
-        st.success(f"✅ {new_name} updated successfully.")
-        st.rerun()
-        
+            # ✅ Handle Image Upload
+            if image_file:
+                image_path = f"{new_name}.png"
+                with open(image_path, "wb") as f:
+                    f.write(image_file.getbuffer())
+
+                image_link = upload_image_to_drive(image_path, new_name)
+                st.success("📸 Image updated successfully!")
+
+            train_and_update_model()
+            st.success(f"✅ {new_name} updated successfully.")
+            st.rerun()
+
+        except Exception as e:
+            st.error(f"⚠️ Error updating Google Sheets: {e}")
 
 # 🎯 **Delete Coffee**
 st.markdown("### 🗑️ Delete Coffee")
