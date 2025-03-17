@@ -87,43 +87,49 @@ st.header("☕ Alex's Coffee Haven: AI Coffee Recommender")
 st.divider()
 
 # ✅ Retrieve Image from Google Drive
-
 def get_image_url_from_drive(coffee_name):
     query = f"'{FOLDER_ID}' in parents and trashed=false"
     files = []
     page_token = None
 
+    # Retrieve all files with pagination
     while True:
-        # Fetch a page of files
         results = drive_service.files().list(
-            q=query,
-            fields="files(id, name, mimeType, nextPageToken)",
-            pageToken=page_token
+            q=query, 
+            fields="nextPageToken, files(id, name)", 
+            pageToken=page_token, 
+            pageSize=100  # Retrieve files in batches of 100
         ).execute()
-        
-        # Append files to the list
-        files.extend(results.get("files", []))
 
-        # Check if there is another page of files
-        page_token = results.get("nextPageToken")
+        files.extend(results.get('files', []))
+        page_token = results.get('nextPageToken')
+
         if not page_token:
-            break  # No more files, exit the loop
+            break
 
-    # Convert coffee name to lowercase and remove spaces and underscores
-    coffee_name_formatted = coffee_name.lower().replace(" ", "").replace("_", "")
+    # Debugging: Print total files found
+    print(f"Total files found in Google Drive: {len(files)}")
 
+    # Normalize the coffee name (no need to add .png here unless it's intended)
+    coffee_name_formatted = coffee_name.strip().lower().replace(" ", "").replace("_", "")
+
+    # Create a list of all file names (normalize file names as well)
+    file_names = [file['name'].strip().lower().replace(" ", "").replace("_", "") for file in files]
+
+    # Debugging: Compare and print file names
+    print("Files in Google Drive:")
     for file in files:
-        # Get the file name, remove spaces and underscores, and strip the extension
-        file_name = file['name'].lower().replace(" ", "").replace("_", "")
-        file_name_without_extension = file_name.rsplit('.', 1)[0]  # Remove the extension
+        print(f"File found: {file['name']}")
 
-        # Check if the formatted coffee name matches the file name without the extension
-        if coffee_name_formatted == file_name_without_extension:
-            # Ensure the file is an image or a supported file type
-            if file['mimeType'].startswith('image/'):
-                return f"https://drive.google.com/uc?id={file['id']}"  # Direct image URL
+    # Check if the normalized coffee name matches any file names
+    if coffee_name_formatted in file_names:
+        # Get the file that matches
+        matching_file = files[file_names.index(coffee_name_formatted)]
+        # Return the image URL for the matched file
+        image_url = f"https://drive.google.com/thumbnail?id={matching_file['id']}&sz=w500"
+        print(f"Found matching image: {image_url}")
+        return image_url
 
-    print(f"⚠️ No image available for this coffee: {coffee_name}")
     return None
 
 # 🎯 **User Input Section**
