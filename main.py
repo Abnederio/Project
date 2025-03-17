@@ -35,7 +35,7 @@ if "GOOGLE_CREDENTIALS" not in st.secrets:
     st.error("❌ GOOGLE_CREDENTIALS not found! Set up secrets in Streamlit Cloud.")
     st.stop()
 
-google_creds = json.loads(st.secrets["GOOGLE_CREDENTIALS"])
+google_creds = st.secrets["GOOGLE_CREDENTIALS"] 
 creds = ServiceAccountCredentials.from_json_keyfile_dict(
     google_creds, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.file"]
 )
