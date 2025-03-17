@@ -33,6 +33,6 @@ cd coffee-recommender
 
 Step 2: pip install -r requirements.txt
 
-Step 3: streamlit run app.py
+Step 3: streamlit run main.py
 
 
