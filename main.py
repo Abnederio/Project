@@ -91,7 +91,7 @@ def get_image_url_from_drive(coffee_name):
     results = drive_service.files().list(q=query, fields="files(id, name)").execute()
     files = results.get("files", [])
 
-    coffee_name_formatted = coffee_name.lower().replace(" ", "").replace("_", "")
+   
 
     for file in files:
         file_name = file['name'].lower().replace(" ", "").replace("_", "")
