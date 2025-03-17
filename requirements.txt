@@ -19,7 +19,6 @@ gunicorn
 oauth2client
 gspread
 pydrive
-json
 
 # Database (Only if using PostgreSQL)
 flask-sqlalchemy
