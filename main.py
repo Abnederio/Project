@@ -47,7 +47,7 @@ client = gspread.authorize(creds)
 sheet = client.open_by_key(SHEET_ID).sheet1
 
 # ✅ Google Drive Setup (For Image Retrieval)
-FOLDER_ID = "1GtQVlpBSe71mvDk5fbkICqMdUuyfyGGn"
+FOLDER_ID = "1GNiAikLM4DAF81mrps1a6Ri2tQZGEqHi"
 drive_service = build("drive", "v3", credentials=creds)
 
 def load_google_sheet():
@@ -87,50 +87,22 @@ st.header("☕ Alex's Coffee Haven: AI Coffee Recommender")
 st.divider()
 
 # ✅ Retrieve Image from Google Drive
+
+# ✅ Retrieve Image from Google Drive
 def get_image_url_from_drive(coffee_name):
     query = f"'{FOLDER_ID}' in parents and trashed=false"
-    files = []
-    page_token = None
+    results = drive_service.files().list(q=query, fields="files(id, name)").execute()
+    files = results.get("files", [])
 
-    # Retrieve all files with pagination
-    while True:
-        results = drive_service.files().list(
-            q=query, 
-            fields="nextPageToken, files(id, name)", 
-            pageToken=page_token, 
-            pageSize=100  # Retrieve files in batches of 100
-        ).execute()
+    coffee_name_formatted = coffee_name.lower().replace(" ", "").replace("_", "")
 
-        files.extend(results.get('files', []))
-        page_token = results.get('nextPageToken')
-
-        if not page_token:
-            break
-
-    # Debugging: Print total files found
-    print(f"Total files found in Google Drive: {len(files)}")
-
-    # Normalize the coffee name (no need to add .png here unless it's intended)
-    coffee_name_formatted = coffee_name.strip().lower().replace(" ", "").replace("_", "")
-
-    # Create a list of all file names (normalize file names as well)
-    file_names = [file['name'].strip().lower().replace(" ", "").replace("_", "") for file in files]
-
-    # Debugging: Compare and print file names
-    print("Files in Google Drive:")
     for file in files:
-        print(f"File found: {file['name']}")
-
-    # Check if the normalized coffee name matches any file names
-    if coffee_name_formatted in file_names:
-        # Get the file that matches
-        matching_file = files[file_names.index(coffee_name_formatted)]
-        # Return the image URL for the matched file
-        image_url = f"https://drive.google.com/thumbnail?id={matching_file['id']}&sz=w500"
-        print(f"Found matching image: {image_url}")
-        return image_url
+        file_name = file['name'].lower().replace(" ", "").replace("_", "")
+        if file_name.startswith(coffee_name_formatted) and file_name.endswith(('.png', '.jpg', '.jpeg')):
+            return f"https://drive.google.com/thumbnail?id={file['id']}&sz=w500"  # Resized URL
 
     return None
+
 
 # 🎯 **User Input Section**
 st.markdown("#### ☕ Select Your Preferences")

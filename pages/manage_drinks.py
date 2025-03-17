@@ -34,7 +34,7 @@ client = gspread.authorize(creds)
 sheet = client.open_by_key(SHEET_ID).sheet1
 
 # ✅ Google Drive Setup (For Image Retrieval)
-FOLDER_ID = "1GtQVlpBSe71mvDk5fbkICqMdUuyfyGGn"
+FOLDER_ID = "1GNiAikLM4DAF81mrps1a6Ri2tQZGEqHi"
 drive_service = build("drive", "v3", credentials=creds)
 
 def authenticate_drive():
