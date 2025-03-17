@@ -10,7 +10,6 @@ from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="wide")
 
 if 'token' not in st.session_state or st.session_state.token is None:
@@ -38,10 +37,7 @@ drive_service = build("drive", "v3", credentials=creds)
 
 # ✅ Upload Image to Google Drive
 def upload_image_to_drive(image_path, image_name):
-    file_metadata = {
-        "name": image_name,
-        "parents": [FOLDER_ID]
-    }
+    file_metadata = {"name": image_name, "parents": [FOLDER_ID]}
     media = {"media_body": image_path}
     
     file_drive = drive_service.files().create(
@@ -60,25 +56,20 @@ def upload_image_to_drive(image_path, image_name):
     return f"https://drive.google.com/uc?id={file_drive['id']}"
 
 
-# ✅ Retrieve Image URL from Google Drive
+# ✅ Retrieve Image from Google Drive
 def get_image_url_from_drive(coffee_name):
     query = f"'{FOLDER_ID}' in parents and trashed=false"
     results = drive_service.files().list(q=query, fields="files(id, name)").execute()
     files = results.get("files", [])
-
-    print("🔍 Retrieved Files from Google Drive:", [file["name"] for file in files])
 
     coffee_name_formatted = coffee_name.lower().strip().replace(" ", "").replace("_", "")
 
     for file in files:
         file_name = file["name"].lower().strip().replace(" ", "").replace("_", "")
 
-        if coffee_name_formatted in file_name:  # ✅ Flexible matching
-            image_url = f"https://drive.google.com/thumbnail?id={file['id']}&sz=w500"
-            print(f"✅ Matched File: {file['name']} -> {image_url}")
-            return image_url
+        if coffee_name_formatted in file_name:
+            return f"https://drive.google.com/thumbnail?id={file['id']}&sz=w500"
 
-    print("⚠️ No matching file found for:", coffee_name)
     return None
 
 
@@ -86,6 +77,7 @@ def get_image_url_from_drive(coffee_name):
 def load_google_sheet():
     data = sheet.get_all_records()
     return pd.DataFrame(data)
+
 
 # ✅ Train & Update Model
 def train_and_update_model():
@@ -114,53 +106,98 @@ def train_and_update_model():
     st.success(f"✅ Model retrained! New accuracy: {accuracy:.2%}")
 
 
+# ✅ Load initial data
 df = load_google_sheet()
 
 # ✅ Show Coffee Menu
 st.markdown("### ☕ Current Coffee Menu")
 st.dataframe(df, height=500)
 
-st.divider()
 
-# ✅ Delete Coffee Function
-def delete_coffee(delete_coffee):
-    global df
-    
-    # Check if image exists
-    coffee_data = df[df["Coffee Name"] == delete_coffee].iloc[0]
-    image_link = coffee_data.get("Image", None)
+# 🎯 **Add Coffee**
+with st.form("add_coffee"):
+    st.markdown("### ➕ Add New Coffee")
 
-    if image_link:
-        image_id = image_link.split("=")[-1]  # Extract image ID
-        try:
-            drive_service.files().delete(fileId=image_id).execute()
-            st.success(f"🗑 Image for {delete_coffee} deleted successfully from Google Drive!")
-        except Exception as e:
-            st.error(f"Error deleting image from Google Drive: {e}")
+    name = st.text_input("Coffee Name", placeholder="Enter coffee name...").strip()
+    caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'])
+    sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'])
+    drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'])
+    roast_level = st.selectbox('Roast Level:', ['Medium', 'None', 'Dark'])
+    milk_type = 'Dairy' if st.toggle("Do you want milk?") else 'No Dairy'
+    flavor_notes = st.selectbox('Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'])
+    bitterness_level = st.selectbox('Bitterness Level:', ['Low', 'Medium', 'High'])
+    weather = st.selectbox('Weather:', ['Hot', 'Cold'])
 
-    # Remove from DataFrame
-    
-    df = df[df["Coffee Name"] != delete_coffee]
+    image_file = st.file_uploader("Upload an image for the coffee", type=['jpg', 'jpeg', 'png'])
 
-    # Remove from Google Sheets
-    try:
-        existing_data = sheet.get_all_records()
-        rows_to_delete = [i + 2 for i, row in enumerate(existing_data) if row["Coffee Name"] == delete_coffee]
+    submit = st.form_submit_button("Add Coffee")
 
-        if rows_to_delete:
-            rows_to_delete.sort(reverse=True)
-            for row in rows_to_delete:
-                sheet.delete_rows(row)
-                st.write(f"Deleted row {row} for {delete_coffee}")
+    if submit:
+        if not name:
+            st.error("❌ Coffee Name is required!")
+        elif name in df["Coffee Name"].values:
+            st.error("⚠️ Coffee already exists!")
+        else:
+            if image_file:
+                image_path = f"{name}.png"
+                with open(image_path, "wb") as f:
+                    f.write(image_file.getbuffer())
+                image_link = upload_image_to_drive(image_path, name)
+            else:
+                image_link = None
 
-            st.success(f"🗑 {delete_coffee} deleted successfully from Google Sheets!")
+            new_entry = [[name, caffeine_level, sweetness, drink_type, roast_level, milk_type, flavor_notes, bitterness_level, weather, image_link]]
+            sheet.append_rows(new_entry, value_input_option='RAW')
+
+            st.success(f"✅ {name} added successfully!")
             train_and_update_model()
             st.rerun()
-        else:
-            st.error("❌ Coffee not found in Google Sheets.")
 
-    except Exception as e:
-        st.error(f"Error updating Google Sheets: {e}")
+# 🎯 **Update Coffee**
+st.markdown("### ✏️ Update Coffee")
+coffee_names = df["Coffee Name"].dropna().unique()
+selected_coffee = st.selectbox("Select coffee to update:", coffee_names)
+
+if selected_coffee:
+    coffee_data = df[df["Coffee Name"] == selected_coffee].iloc[0]
+
+    # Pre-fill form with existing values
+    new_name = st.text_input("Coffee Name", value=coffee_data["Coffee Name"])
+    new_caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Caffeine Level"]))
+    new_sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Sweetness"]))
+    new_drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'], index=['Frozen', 'Iced', 'Hot'].index(coffee_data["Type"]))
+    new_roast_level = st.selectbox('Roast Level:', ['Medium', 'None', 'Dark'], index=['Medium', 'None', 'Dark'].index(coffee_data["Roast Level"]))
+    new_milk_type = 'Dairy' if coffee_data["Milk Type"] == "Dairy" else 'No Dairy'
+    new_flavor_notes = st.selectbox('Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'], index=['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'].index(coffee_data["Flavor Notes"]))
+    new_bitterness_level = st.selectbox('Bitterness Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Bitterness Level"]))
+    new_weather = st.selectbox('Weather:', ['Hot', 'Cold'], index=['Hot', 'Cold'].index(coffee_data["Weather"]))
+
+    image_file = st.file_uploader("Upload a new image for the coffee", type=['jpg', 'jpeg', 'png'])
+
+    if st.button("Update Coffee"):
+        df.loc[df["Coffee Name"] == selected_coffee, ["Coffee Name", "Caffeine Level", "Sweetness", "Type", "Roast Level", "Milk Type", "Flavor Notes", "Bitterness Level", "Weather"]] = [
+            new_name, new_caffeine_level, new_sweetness, new_drink_type, new_roast_level, new_milk_type, new_flavor_notes, new_bitterness_level, new_weather
+        ]
+
+        if image_file:
+            image_path = f"{new_name}.png"
+            with open(image_path, "wb") as f:
+                f.write(image_file.getbuffer())
+            image_link = upload_image_to_drive(image_path, new_name)
+            df.loc[df["Coffee Name"] == new_name, "Image"] = image_link
+
+        train_and_update_model()
+        st.success(f"✅ {new_name} updated successfully.")
+        st.rerun()
+        
+
+# 🎯 **Delete Coffee**
+delete_coffee = st.selectbox("Select coffee to delete:", df["Coffee Name"].dropna().unique())
+if st.button("Delete Coffee"):
+    delete_coffee(delete_coffee)
+
+
+st.divider()
 
 # ✅ Sidebar Navigation
 st.sidebar.markdown("### 🔧 Admin Panel")
@@ -169,6 +206,8 @@ if st.sidebar.button("🏠 Back to Menu"):
 if st.sidebar.button("🚪 Logout"):
     st.session_state.token = None
     st.switch_page("pages/admin.py")
+
+
 
 
 
