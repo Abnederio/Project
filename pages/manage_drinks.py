@@ -9,6 +9,7 @@ from googleapiclient.discovery import build
 from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from googleapiclient.http import MediaFileUpload
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="wide")
 
@@ -38,11 +39,13 @@ drive_service = build("drive", "v3", credentials=creds)
 # ✅ Upload Image to Google Drive
 def upload_image_to_drive(image_path, image_name):
     file_metadata = {"name": image_name, "parents": [FOLDER_ID]}
-    media = {"media_body": image_path}
-    
+
+    # ✅ Use MediaFileUpload instead of a dictionary
+    media = MediaFileUpload(image_path, mimetype="image/png")  
+
     file_drive = drive_service.files().create(
         body=file_metadata,
-        media_body=media,
+        media_body=media,  # ✅ Corrected here
         fields="id"
     ).execute()
 
@@ -52,7 +55,6 @@ def upload_image_to_drive(image_path, image_name):
         body={"type": "anyone", "role": "reader"}
     ).execute()
 
-    # ✅ Return direct image link
     return f"https://drive.google.com/uc?id={file_drive['id']}"
 
 
