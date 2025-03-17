@@ -82,7 +82,7 @@ else:
     joblib.dump(model, MODEL_PATH)
     joblib.dump(accuracy, ACCURACY_PATH)
 
-st.image("Header.png", width=800)
+st.image("Header.png", width=1000)
 st.header("☕ Alex's Coffee Haven: AI Coffee Recommender")
 st.divider()
 
