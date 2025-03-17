@@ -101,17 +101,17 @@ def get_image_url_from_drive(coffee_name):
         file_name = file['name'].lower().replace(" ", "").replace("_", "")
         file_name_without_extension = file_name.rsplit('.', 1)[0]  # Remove the extension
 
+        # Print for debugging
+        print(f"Comparing '{coffee_name_formatted}' with '{file_name_without_extension}'")
+
         # Check if the formatted coffee name matches the file name without the extension
         if coffee_name_formatted == file_name_without_extension:
             # Ensure the file is an image or a supported file type
             if file['mimeType'].startswith('image/'):
                 return f"https://drive.google.com/uc?id={file['id']}"  # Direct image URL
             
-    print(coffee_name_formatted)
-
     print(f"⚠️ No image available for this coffee: {coffee_name}")
     return None
-
 
 # 🎯 **User Input Section**
 st.markdown("#### ☕ Select Your Preferences")
