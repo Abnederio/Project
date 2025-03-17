@@ -91,13 +91,19 @@ def get_image_url_from_drive(coffee_name):
     results = drive_service.files().list(q=query, fields="files(id, name)").execute()
     files = results.get("files", [])
 
-    for file in files:
-        file_name = file['name'].lower().replace(" ", "").replace("_", "")
-        print(f"Comparing to file: {coffee_name}")
-        if file_name.startswith(coffee_name) and coffee_name.endswith(('.png', '.jpg', '.jpeg')):
-            print(f"https://drive.google.com/thumbnail?id={file['id']}&sz=w500")
-            return f"https://drive.google.com/thumbnail?id={file['id']}&sz=w500"  # Resized URL
+    # Normalize the coffee name (lowercase, replace spaces with underscores)
+    coffee_name_normalized = coffee_name.lower().replace(" ", "").replace("_", "")
 
+    for file in files:
+        # Normalize the file name (lowercase, replace spaces with underscores)
+        file_name_normalized = file['name'].lower().replace(" ", "").replace("_", "")
+
+        print(f"Comparing coffee name: {coffee_name_normalized} to file: {file_name_normalized}")
+
+        # Check if normalized coffee name is a substring of the normalized file name
+        if coffee_name_normalized in file_name_normalized:
+            print(f"Found image: https://drive.google.com/thumbnail?id={file['id']}&sz=w500")
+            return f"https://drive.google.com/thumbnail?id={file['id']}&sz=w500"
 
     return None
 
