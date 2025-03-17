@@ -11,7 +11,6 @@ from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import json
-from fuzzywuzzy import fuzz
 import requests
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="centered")
@@ -91,28 +90,27 @@ st.divider()
 
 def get_image_url_from_drive(coffee_name):
     query = f"'{FOLDER_ID}' in parents and trashed=false"
-    results = drive_service.files().list(q=query, fields="files(id, name)").execute()
+    results = drive_service.files().list(q=query, fields="files(id, name, mimeType)").execute()
     files = results.get("files", [])
 
+    # Convert coffee name to lowercase and remove spaces and underscores
     coffee_name_formatted = coffee_name.lower().replace(" ", "").replace("_", "")
 
-    closest_match = None
-    highest_ratio = 0  # Track highest match score
-
     for file in files:
+        # Get the file name without the extension
         file_name = file['name'].lower().replace(" ", "").replace("_", "")
-        # Calculate fuzzy match ratio
-        ratio = fuzz.ratio(coffee_name_formatted, file_name)
+        file_name_without_extension = file_name.rsplit('.', 1)[0]  # Remove the extension
 
-        if ratio > highest_ratio:
-            highest_ratio = ratio
-            closest_match = file  # Store the file with the highest similarity score
+        # Check if the coffee name matches the file name without the extension
+        if coffee_name_formatted == file_name_without_extension:
+            # Ensure the file is an image or a supported file type
+            if file['mimeType'].startswith('image/'):
+                return f"https://drive.google.com/uc?id={file['id']}"  # Direct image URL
 
-    if closest_match:
-        # Correct image URL to display directly
-        return f"https://drive.google.com/uc?id={closest_match['id']}"  # Direct image URL
-
+    print(f"⚠️ No image available for this coffee: {coffee_name}")
     return None
+
+
 
 # 🎯 **User Input Section**
 st.markdown("#### ☕ Select Your Preferences")
