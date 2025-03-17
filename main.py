@@ -111,18 +111,19 @@ st.markdown("#### ☕ Select Your Preferences")
 col1, col2 = st.columns(2)
 
 with col1:
-    caffeine_level = st.selectbox('☕ Caffeine Level:', ['Low', 'Medium', 'High'])
-    sweetness = st.selectbox('🍬 Sweetness:', ['Low', 'Medium', 'High'])
-    drink_type = st.selectbox('❄️ Drink Type:', ['Frozen', 'Iced', 'Hot'])
-    roast_level = st.selectbox('🔥 Roast Level:', ['Medium', 'None', 'Dark'])
+    caffeine_level = st.selectbox('☕ Caffeine Level:', ['Select an option', 'Low', 'Medium', 'High'])
+    sweetness = st.selectbox('🍬 Sweetness:', ['Select an option', 'Low', 'Medium', 'High'])
+    drink_type = st.selectbox('❄️ Drink Type:', ['Select an option', 'Frozen', 'Iced', 'Hot'])
+    roast_level = st.selectbox('🔥 Roast Level:', ['Select an option', 'Medium', 'None', 'Dark'])
 
 with col2:
     milk_type = 'Dairy' if st.toggle("🥛 Do you want milk?") else 'No Dairy'
-    flavor_notes = st.selectbox('🍫 Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'])
-    bitterness_level = st.selectbox('🏴 Bitterness Level:', ['Low', 'Medium', 'High'])
-    weather = st.selectbox('🌡 Weather:', ['Hot', 'Cold'])
+    flavor_notes = st.selectbox('🍫 Flavor Notes:', ['Select an option', 'Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'])
+    bitterness_level = st.selectbox('🏴 Bitterness Level:', ['Select an option', 'Low', 'Medium', 'High'])
+    weather = st.selectbox('🌡 Weather:', ['Select an option', 'Hot', 'Cold'])
 
-st.divider()  
+st.divider()
+
 
 # 🌟 **Recommendation Section**
 st.markdown("### ☕ AI Coffee Recommendation")
