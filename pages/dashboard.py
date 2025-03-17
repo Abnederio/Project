@@ -5,6 +5,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 import gspread
 import joblib
 from sklearn.metrics import accuracy_score
+from googleapiclient.discovery import build
 
 # ✅ Set Page Configuration
 st.set_page_config(
@@ -13,15 +14,24 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ✅ Load Google API Credentials Securely (from Streamlit Secrets)
+if "GOOGLE_CREDENTIALS" not in st.secrets:
+    st.error("❌ GOOGLE_CREDENTIALS not found! Set up secrets in Streamlit Cloud.")
+    st.stop()
+
+google_creds = st.secrets["GOOGLE_CREDENTIALS"] 
+creds = ServiceAccountCredentials.from_json_keyfile_dict(
+    google_creds, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.file"]
+)
+
 # ✅ Google Sheets Setup
 SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
-SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-CREDS_FILE = "civic-pulsar-453709-f7-10c1906e9ce5.json"
-
-# ✅ Authenticate Google Sheets
-creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
 client = gspread.authorize(creds)
 sheet = client.open_by_key(SHEET_ID).sheet1
+
+# ✅ Google Drive Setup (For Image Retrieval)
+FOLDER_ID = "1GtQVlpBSe71mvDk5fbkICqMdUuyfyGGn"
+drive_service = build("drive", "v3", credentials=creds)
 
 def load_google_sheet():
     """Load coffee data from Google Sheets."""

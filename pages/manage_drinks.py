@@ -10,8 +10,7 @@ from pydrive.drive import GoogleDrive
 from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-
-
+from googleapiclient.discovery import build
 
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="wide")
@@ -19,18 +18,24 @@ st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recomme
 if 'token' not in st.session_state or st.session_state.token is None:
     st.switch_page("pages/admin.py") 
 
-# 🔹 Google Sheets Setup
-SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"  # Your Google Sheet ID
-SCOPE = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.file"]
-CREDS_FILE = "civic-pulsar-453709-f7-10c1906e9ce5.json"  # Your Google API credentials
+# ✅ Load Google API Credentials Securely (from Streamlit Secrets)
+if "GOOGLE_CREDENTIALS" not in st.secrets:
+    st.error("❌ GOOGLE_CREDENTIALS not found! Set up secrets in Streamlit Cloud.")
+    st.stop()
 
-# 🔹 Authenticate Google Sheets
-creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
+google_creds = st.secrets["GOOGLE_CREDENTIALS"] 
+creds = ServiceAccountCredentials.from_json_keyfile_dict(
+    google_creds, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.file"]
+)
+
+# ✅ Google Sheets Setup
+SHEET_ID = "1NCHaEsTIvYUSUgc2VHheP1qMF9nIWW3my5T6NpoNZOk"
 client = gspread.authorize(creds)
-sheet = client.open_by_key(SHEET_ID).sheet1  # Access the first sheet
+sheet = client.open_by_key(SHEET_ID).sheet1
 
-# 🔹 Google Drive Setup
-FOLDER_ID = "1GtQVlpBSe71mvDk5fbkICqMdUuyfyGGn"  # Your Google Drive Folder ID
+# ✅ Google Drive Setup (For Image Retrieval)
+FOLDER_ID = "1GtQVlpBSe71mvDk5fbkICqMdUuyfyGGn"
+drive_service = build("drive", "v3", credentials=creds)
 
 def authenticate_drive():
     creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
