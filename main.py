@@ -131,7 +131,6 @@ with col2:
 
 st.divider()
 
-
 # 🌟 **Recommendation Section**
 st.markdown("### ☕ AI Coffee Recommendation")
 
@@ -151,42 +150,48 @@ features = f"""
 """
 
 if st.button("🎯 Recommend Coffee"):
-    rfr_input_data = [[caffeine_level, sweetness, drink_type, roast_level, milk_type, flavor_notes, bitterness_level, weather]]
-    rfr_prediction = model.predict(rfr_input_data)
     
-    recommended_coffee = rfr_prediction[0] if isinstance(rfr_prediction, (list, np.ndarray)) else rfr_prediction  
-    recommended_coffee = str(recommended_coffee).strip("[]'")  
+    if "Select an option" in [caffeine_level, sweetness, drink_type, roast_level, flavor_notes, bitterness_level, weather]:
+        st.error("❌ Please fill up all of the options for better recommendation!") 
+        
+    else:
+        
+        rfr_input_data = [[caffeine_level, sweetness, drink_type, roast_level, milk_type, flavor_notes, bitterness_level, weather]]
+        rfr_prediction = model.predict(rfr_input_data)
+        
+        recommended_coffee = rfr_prediction[0] if isinstance(rfr_prediction, (list, np.ndarray)) else rfr_prediction  
+        recommended_coffee = str(recommended_coffee).strip("[]'")  
 
-    st.success(f"☕ **Your ideal coffee is: {recommended_coffee}**")
+        st.success(f"☕ **Your ideal coffee is: {recommended_coffee}**")
 
-    # ✅ Get Image from Google Drive
-    image_link = get_image_url_from_drive(recommended_coffee)
+        # ✅ Get Image from Google Drive
+        image_link = get_image_url_from_drive(recommended_coffee)
 
-    if image_link:
-        response = requests.get(image_link)
+        if image_link:
+            response = requests.get(image_link)
 
-        # Check if response is an image
-        if "image" not in response.headers.get("Content-Type", ""):
-            st.error("🚨 Error: The image is not valid! Google Drive may be blocking access.")
-            st.write(f"[View Image in Drive]({image_link})")
+            # Check if response is an image
+            if "image" not in response.headers.get("Content-Type", ""):
+                st.error("🚨 Error: The image is not valid! Google Drive may be blocking access.")
+                st.write(f"[View Image in Drive]({image_link})")
+            else:
+                st.image(response.content, width=500)
         else:
-            st.image(response.content, width=500)
-    else:
-        print("Image URL:", image_link)
-        st.warning("⚠️ No image available for this coffee.")
+            print("Image URL:", image_link)
+            st.warning("⚠️ No image available for this coffee.")
 
-    # ✅ Gemini AI Explanation
-    genai.configure(api_key="AIzaSyAXpLVdg1s1dpRj0-Crb7HYhr2xHvGUffg")
-    ai_model = genai.GenerativeModel("gemini-2.0-flash")
-    response2 = ai_model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features} make it like a true salesperson. Explain in 5 sentences.")
-    
-    explanation = response2.text
+        # ✅ Gemini AI Explanation
+        genai.configure(api_key="AIzaSyAXpLVdg1s1dpRj0-Crb7HYhr2xHvGUffg")
+        ai_model = genai.GenerativeModel("gemini-2.0-flash")
+        response2 = ai_model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features} make it like a true salesperson. Explain in 5 sentences.")
+        
+        explanation = response2.text
 
-    if explanation:
-        st.markdown(f"#### 💡 Why this coffee?")
-        st.info(explanation)
-    else:
-        st.warning("🤖 AI couldn't generate an explanation. Please try again.")
+        if explanation:
+            st.markdown(f"#### 💡 Why this coffee?")
+            st.info(explanation)
+        else:
+            st.warning("🤖 AI couldn't generate an explanation. Please try again.")
 
 st.divider()
 
