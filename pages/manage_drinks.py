@@ -197,7 +197,38 @@ if selected_coffee:
 st.markdown("### 🗑️ Delete Coffee")
 delete_coffee = st.selectbox("Select coffee to delete:", df["Coffee Name"].dropna().unique())
 if st.button("Delete Coffee"):
-    delete_coffee(delete_coffee)
+    # ✅ Fetch data from Google Sheets
+    existing_data = sheet.get_all_records()
+
+    # ✅ Find all rows matching the selected coffee
+    rows_to_delete = [i + 2 for i, row in enumerate(existing_data) if row["Coffee Name"] == delete_coffee]
+
+    if rows_to_delete:
+        try:
+            # ✅ Delete from bottom to top to prevent row shifting issues
+            rows_to_delete.sort(reverse=True)
+            for row in rows_to_delete:
+                sheet.delete_rows(row)
+
+            st.success(f"🗑 {delete_coffee} deleted successfully from Google Sheets!")
+
+            # ✅ Try to remove the image from Google Drive
+            image_link = get_image_url_from_drive(delete_coffee)
+            if image_link:
+                image_id = image_link.split("id=")[-1]  # Extract Image ID
+                drive_service.files().delete(fileId=image_id).execute()
+                st.success(f"🗑 Image for {delete_coffee} deleted successfully from Google Drive!")
+
+            # ✅ Retrain model after deletion
+            train_and_update_model()
+            st.rerun()
+
+        except Exception as e:
+            st.error(f"⚠️ Error deleting coffee: {e}")
+
+    else:
+        st.error("❌ Coffee not found in Google Sheets.")
+
 
 
 st.divider()
