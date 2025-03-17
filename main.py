@@ -106,6 +106,8 @@ def get_image_url_from_drive(coffee_name):
             # Ensure the file is an image or a supported file type
             if file['mimeType'].startswith('image/'):
                 return f"https://drive.google.com/uc?id={file['id']}"  # Direct image URL
+            
+    print(coffee_name_formatted)
 
     print(f"⚠️ No image available for this coffee: {coffee_name}")
     return None
