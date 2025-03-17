@@ -90,8 +90,24 @@ st.divider()
 
 def get_image_url_from_drive(coffee_name):
     query = f"'{FOLDER_ID}' in parents and trashed=false"
-    results = drive_service.files().list(q=query, fields="files(id, name, mimeType)").execute()
-    files = results.get("files", [])
+    files = []
+    page_token = None
+
+    while True:
+        # Fetch a page of files
+        results = drive_service.files().list(
+            q=query,
+            fields="files(id, name, mimeType, nextPageToken)",
+            pageToken=page_token
+        ).execute()
+        
+        # Append files to the list
+        files.extend(results.get("files", []))
+
+        # Check if there is another page of files
+        page_token = results.get("nextPageToken")
+        if not page_token:
+            break  # No more files, exit the loop
 
     # Convert coffee name to lowercase and remove spaces and underscores
     coffee_name_formatted = coffee_name.lower().replace(" ", "").replace("_", "")
@@ -101,15 +117,12 @@ def get_image_url_from_drive(coffee_name):
         file_name = file['name'].lower().replace(" ", "").replace("_", "")
         file_name_without_extension = file_name.rsplit('.', 1)[0]  # Remove the extension
 
-        # Print for debugging
-        print(f"Comparing '{coffee_name_formatted}' with '{file_name_without_extension}'")
-
         # Check if the formatted coffee name matches the file name without the extension
         if coffee_name_formatted == file_name_without_extension:
             # Ensure the file is an image or a supported file type
             if file['mimeType'].startswith('image/'):
                 return f"https://drive.google.com/uc?id={file['id']}"  # Direct image URL
-            
+
     print(f"⚠️ No image available for this coffee: {coffee_name}")
     return None
 
