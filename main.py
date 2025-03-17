@@ -97,11 +97,11 @@ def get_image_url_from_drive(coffee_name):
     coffee_name_formatted = coffee_name.lower().replace(" ", "").replace("_", "")
 
     for file in files:
-        # Get the file name without the extension
+        # Get the file name, remove spaces and underscores, and strip the extension
         file_name = file['name'].lower().replace(" ", "").replace("_", "")
         file_name_without_extension = file_name.rsplit('.', 1)[0]  # Remove the extension
 
-        # Check if the coffee name matches the file name without the extension
+        # Check if the formatted coffee name matches the file name without the extension
         if coffee_name_formatted == file_name_without_extension:
             # Ensure the file is an image or a supported file type
             if file['mimeType'].startswith('image/'):
@@ -109,7 +109,6 @@ def get_image_url_from_drive(coffee_name):
 
     print(f"⚠️ No image available for this coffee: {coffee_name}")
     return None
-
 
 
 # 🎯 **User Input Section**
