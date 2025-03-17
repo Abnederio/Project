@@ -23,5 +23,6 @@ pydrive
 # Database (Only if using PostgreSQL)
 flask-sqlalchemy
 psycopg2-binary
+fuzzywuzzy
 
 

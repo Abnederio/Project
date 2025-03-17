@@ -11,6 +11,7 @@ from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import json
+from fuzzywuzzy import fuzz
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="centered")
 # CSS
@@ -86,24 +87,29 @@ st.header("☕ Alex's Coffee Haven: AI Coffee Recommender")
 st.divider()
 
 # ✅ Retrieve Image from Google Drive
+
 def get_image_url_from_drive(coffee_name):
     query = f"'{FOLDER_ID}' in parents and trashed=false"
     results = drive_service.files().list(q=query, fields="files(id, name)").execute()
     files = results.get("files", [])
 
-    # Normalize the coffee name (lowercase, replace spaces with underscores)
-    coffee_name_normalized = coffee_name.lower().replace(" ", "").replace("_", "")
+    coffee_name_formatted = coffee_name.lower().replace(" ", "").replace("_", "")
+
+    closest_match = None
+    highest_ratio = 0  # Track highest match score
 
     for file in files:
-        # Normalize the file name (lowercase, replace spaces with underscores)
-        file_name_normalized = file['name'].lower().replace(" ", "").replace("_", "")
+        file_name = file['name'].lower().replace(" ", "").replace("_", "")
+        # Calculate fuzzy match ratio
+        ratio = fuzz.ratio(coffee_name_formatted, file_name)
 
-        print(f"Comparing coffee name: {coffee_name_normalized} to file: {file_name_normalized}")
+        if ratio > highest_ratio:
+            highest_ratio = ratio
+            closest_match = file  # Store the file with the highest similarity score
 
-        # Check if normalized coffee name is a substring of the normalized file name
-        if coffee_name_normalized in file_name_normalized:
-            print(f"Found image: https://drive.google.com/thumbnail?id={file['id']}&sz=w500")
-            return f"https://drive.google.com/thumbnail?id={file['id']}&sz=w500"
+    if closest_match:
+        # Correct image URL to display directly
+        return f"https://drive.google.com/uc?id={closest_match['id']}"  # Direct image URL
 
     return None
 
@@ -158,16 +164,22 @@ if st.button("🎯 Recommend Coffee"):
     image_link = get_image_url_from_drive(recommended_coffee)
 
     if image_link:
-        st.markdown(
-            f"""
-            <div style="display: flex; justify-content: center; margin-top: 20px;">
-                <img src="{image_link}" width="400" style="border-radius: 12px;">
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.image(image_link, width=400)  # Adjust the width as needed
     else:
         st.warning("⚠️ No image available for this coffee.")
+
+    # ✅ Gemini AI Explanation
+    genai.configure(api_key="AIzaSyAXpLVdg1s1dpRj0-Crb7HYhr2xHvGUffg")
+    ai_model = genai.GenerativeModel("gemini-2.0-flash")
+    response = ai_model.generate_content(f"Explain why '{recommended_coffee}' was recommended based on:\n\n{features} make it like a true salesperson. Explain in 5 sentences.")
+    
+    explanation = response.text
+
+    if explanation:
+        st.markdown(f"#### 💡 Why this coffee?")
+        st.info(explanation)
+    else:
+        st.warning("🤖 AI couldn't generate an explanation. Please try again.")
 
     # ✅ Gemini AI Explanation
     genai.configure(api_key="AIzaSyAXpLVdg1s1dpRj0-Crb7HYhr2xHvGUffg")
