@@ -95,7 +95,7 @@ def get_image_url_from_drive(coffee_name):
 
     for file in files:
         file_name = file['name'].lower().replace(" ", "").replace("_", "")
-        if file_name.startswith(coffee_name_formatted) and file_name.endswith(('.png', '.jpg', '.jpeg')):
+        if file_name.startswith(coffee_name) and file_name.endswith(('.png', '.jpg', '.jpeg')):
             return f"https://drive.google.com/thumbnail?id={file['id']}&sz=w500"  # Resized URL
 
     return None
