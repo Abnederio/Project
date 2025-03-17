@@ -10,6 +10,7 @@ from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from googleapiclient.http import MediaFileUpload
+import random
 
 st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recommender", layout="wide")
 
@@ -150,6 +151,21 @@ with st.form("add_coffee"):
 
             new_entry = [[name, caffeine_level, sweetness, drink_type, roast_level, milk_type, flavor_notes, bitterness_level, weather] for _ in range(10)]
             sheet.append_rows(new_entry)
+            
+             # ✅ Shuffle Google Sheets Data
+            try:
+                data = sheet.get_all_values()  # Get all data
+                headers = data[0]  # Keep headers
+                rows = data[1:]  # Data rows (excluding headers)
+                random.shuffle(rows)  # Shuffle rows
+
+                # ✅ Clear the sheet & write shuffled data
+                sheet.clear()
+                sheet.append_rows([headers] + rows, value_input_option='RAW')
+
+                st.success(f"✅ {name} added and Google Sheets shuffled!")
+            except Exception as e:
+                st.error(f"⚠️ Error shuffling Google Sheets: {e}")
 
             st.success(f"✅ {name} added successfully!")
             train_and_update_model()
