@@ -22,11 +22,11 @@ st.markdown(
     <style>
         /* Background */
         body {
-            background-color: #F5E8C7 !important;  /* Creamy Latte */
-        }
+        background-color: #A27B5C;
+              }
         .stApp {
-            background-color: #F5E8C7 !important;  /* Soft welcoming tone */
-        }
+            background-color: #A27B5C; 
+              }
     </style>
     """,
     unsafe_allow_html=True
