@@ -51,7 +51,8 @@ st.markdown(
             transform: scale(0.95);
             background-color: #2E1B14;  /* Strong Espresso */
         }
-    /* Customize the select box */
+
+        /* Customize the select box container */
         div[data-baseweb="select"] > div {
             background-color: #3E2723 !important;  /* Dark Coffee Brown */
             color: #FFFFFF !important; /* White text */
@@ -61,20 +62,36 @@ st.markdown(
             border: 2px solid #5D4037 !important;
         }
 
-        /* Change the dropdown text color */
+        /* Change the text color inside the select box */
         div[data-baseweb="select"] span {
             color: white !important; 
         }
 
+        /* Style the dropdown items */
+        ul[role="listbox"] {
+            background-color: #3E2723 !important; /* Match button color */
+            border-radius: 8px !important;
+            padding: 5px !important;
+            border: 2px solid #5D4037 !important;
+        }
+
         /* Change the hovered dropdown items */
-        div[data-baseweb="select"] ul li:hover {
+        ul[role="listbox"] li:hover {
             background-color: #5D4037 !important; /* Lighter brown on hover */
             color: white !important;
+        }
+
+        /* Ensure selected dropdown option is visible */
+        ul[role="listbox"] li[aria-selected="true"] {
+            background-color: #4E342E !important; /* Rich Coffee */
+            color: white !important;
+            font-weight: bold !important;
         }
     </style>
     """,
     unsafe_allow_html=True
 )
+
 
 
 #  Load Google API Credentials 
