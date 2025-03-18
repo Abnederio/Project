@@ -176,6 +176,34 @@ with col1:
         weather = st.selectbox('Weather:', ['Hot', 'Cold'])
 
         image_file = st.file_uploader("Upload an image for the coffee", type=['jpg', 'jpeg', 'png'])
+        
+        st.markdown(
+        """
+        <style>
+        div.stButton > button {
+            background-color: #3E2723; /* Espresso Brown */
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            padding: 10px 20px;
+            border: 2px solid #5D4037;
+            transition: all 0.3s ease-in-out;
+        }
+        div.stButton > button:hover {
+            background-color: #4E342E;
+            transform: scale(1.08);
+            border-color: #3E2723;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        div.stButton > button:active {
+            transform: scale(0.95);
+            background-color: #2E1B14;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
         submit = st.form_submit_button("Add Coffee")
 
