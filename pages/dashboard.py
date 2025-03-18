@@ -14,6 +14,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+if "token" not in st.session_state or not st.session_state.token:
+    st.switch_page("pages/admin.py")
+
 # ✅ Load Google API Credentials Securely (from Streamlit Secrets)
 if "GOOGLE_CREDENTIALS" not in st.secrets:
     st.error("❌ GOOGLE_CREDENTIALS not found! Set up secrets in Streamlit Cloud.")
