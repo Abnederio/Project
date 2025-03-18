@@ -22,23 +22,42 @@ st.markdown(
     <style>
         /* Background */
         body {
-        background-color: #A27B5C;
-              }
+            background-color: #A27B5C;  /* Warm Coffee Tone */
+        }
         .stApp {
             background-color: #A27B5C; 
-              }
-        div.stButton > button:last-child {
-            background-color: #5E503F;  /* Dark Mocha */
-            color: white;
         }
+
+        /* Submit Button */
+        div.stButton > button:last-child {
+            background-color: #3E2723;  /* Espresso Brown */
+            color: #FFFFFF;  /* White Text */
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            padding: 10px 20px;
+            border: 2px solid #5D4037;  /* Subtle Border */
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Hover Effect */
         div.stButton > button:last-child:hover {
-            background-color: #4A4032;  /* Richer Mocha */
-            transform: scale(1.05);
+            background-color: #4E342E;  /* Richer Coffee */
+            transform: scale(1.08);
+            border-color: #3E2723;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Click Effect */
+        div.stButton > button:last-child:active {
+            transform: scale(0.95);
+            background-color: #2E1B14;  /* Strong Espresso */
         }
     </style>
     """,
     unsafe_allow_html=True
 )
+
 
 # ✅ Load Google API Credentials Securely
 if "GOOGLE_CREDENTIALS" not in st.secrets:
