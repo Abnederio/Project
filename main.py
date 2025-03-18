@@ -51,6 +51,26 @@ st.markdown(
             transform: scale(0.95);
             background-color: #2E1B14;  /* Strong Espresso */
         }
+    /* Customize the select box */
+        div[data-baseweb="select"] > div {
+            background-color: #3E2723 !important;  /* Dark Coffee Brown */
+            color: #FFFFFF !important; /* White text */
+            font-size: 16px !important;
+            border-radius: 8px !important;
+            padding: 10px !important;
+            border: 2px solid #5D4037 !important;
+        }
+
+        /* Change the dropdown text color */
+        div[data-baseweb="select"] span {
+            color: white !important; 
+        }
+
+        /* Change the hovered dropdown items */
+        div[data-baseweb="select"] ul li:hover {
+            background-color: #5D4037 !important; /* Lighter brown on hover */
+            color: white !important;
+        }
     </style>
     """,
     unsafe_allow_html=True
