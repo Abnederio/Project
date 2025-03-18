@@ -54,7 +54,7 @@ if "token" not in st.session_state or not st.session_state.token:
 
 # ✅ Title with spacing
 st.title("☕ Admin Dashboard")
-st.markdown("### Manage everything from here")
+st.markdown("### Manage and monitor: ")
 
 # ✅ Centered menu buttons
 st.divider()  # Add a divider for better separation
