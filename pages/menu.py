@@ -9,6 +9,13 @@ API_URL = "https://project-a2bt.onrender.com"
 # ✅ Custom CSS for a cleaner UI
 st.markdown("""
     <style>
+        /* Background */
+        body {
+        background-color: #A27B5C;
+              }
+        .stApp {
+            background-color: #A27B5C; 
+              }
         div.stButton > button {
             width: 100%;
             border-radius: 10px;
