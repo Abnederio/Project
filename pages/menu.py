@@ -16,17 +16,12 @@ st.markdown("""
         .stApp {
             background-color: #A27B5C; 
               }
-        div.stButton > button {
-            width: 100%;
-            border-radius: 10px;
-            background-color: #0078D4;
+        div.stButton > button:last-child {
+            background-color: #5E503F;  /* Dark Mocha */
             color: white;
-            font-size: 18px;
-            padding: 10px;
-            transition: all 0.3s ease-in-out;
         }
-        div.stButton > button:hover {
-            background-color: #0056b3;
+        div.stButton > button:last-child:hover {
+            background-color: #4A4032;  /* Richer Mocha */
             transform: scale(1.05);
         }
     </style>
