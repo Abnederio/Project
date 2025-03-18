@@ -27,6 +27,14 @@ st.markdown(
         .stApp {
             background-color: #A27B5C; 
               }
+        div.stButton > button:last-child {
+            background-color: #5E503F;  /* Dark Mocha */
+            color: white;
+        }
+        div.stButton > button:last-child:hover {
+            background-color: #4A4032;  /* Richer Mocha */
+            transform: scale(1.05);
+        }
     </style>
     """,
     unsafe_allow_html=True
