@@ -131,150 +131,154 @@ df = load_google_sheet()
 st.markdown("### ☕ Current Coffee Menu")
 st.dataframe(df, height=500)
 
+col1, col2, col3 = st.columns(3)
 
-# 🎯 **Add Coffee**
-with st.form("add_coffee"):
-    st.markdown("### ➕ Add New Coffee")
+with col1:
+    # 🎯 **Add Coffee**
+    with st.form("add_coffee"):
+        st.markdown("### ➕ Add New Coffee")
 
-    name = st.text_input("Coffee Name", placeholder="Enter coffee name...").strip()
-    caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'])
-    sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'])
-    drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'])
-    roast_level = st.selectbox('Roast Level:', ['Medium', 'None', 'Dark'])
-    milk_type = 'Dairy' if st.toggle("Do you want milk?") else 'No Dairy'
-    flavor_notes = st.selectbox('Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'])
-    bitterness_level = st.selectbox('Bitterness Level:', ['Low', 'Medium', 'High'])
-    weather = st.selectbox('Weather:', ['Hot', 'Cold'])
+        name = st.text_input("Coffee Name", placeholder="Enter coffee name...").strip()
+        caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'])
+        sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'])
+        drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'])
+        roast_level = st.selectbox('Roast Level:', ['Medium', 'None', 'Dark'])
+        milk_type = 'Dairy' if st.toggle("Do you want milk?") else 'No Dairy'
+        flavor_notes = st.selectbox('Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'])
+        bitterness_level = st.selectbox('Bitterness Level:', ['Low', 'Medium', 'High'])
+        weather = st.selectbox('Weather:', ['Hot', 'Cold'])
 
-    image_file = st.file_uploader("Upload an image for the coffee", type=['jpg', 'jpeg', 'png'])
+        image_file = st.file_uploader("Upload an image for the coffee", type=['jpg', 'jpeg', 'png'])
 
-    submit = st.form_submit_button("Add Coffee")
+        submit = st.form_submit_button("Add Coffee")
 
-    if submit:
-        if not name:
-            st.error("❌ Coffee Name is required!")
-        elif name in df["Coffee Name"].values:
-            st.error("⚠️ Coffee already exists!")
-        else:
-            if image_file:
-                image_path = f"{name}.png"
-                with open(image_path, "wb") as f:
-                    f.write(image_file.getbuffer())
-                image_link = upload_image_to_drive(image_path, name)
+        if submit:
+            if not name:
+                st.error("❌ Coffee Name is required!")
+            elif name in df["Coffee Name"].values:
+                st.error("⚠️ Coffee already exists!")
             else:
-                image_link = None
+                if image_file:
+                    image_path = f"{name}.png"
+                    with open(image_path, "wb") as f:
+                        f.write(image_file.getbuffer())
+                    image_link = upload_image_to_drive(image_path, name)
+                else:
+                    image_link = None
 
-            new_entry = [[name, caffeine_level, sweetness, drink_type, roast_level, milk_type, flavor_notes, bitterness_level, weather] for _ in range(10)]
-            sheet.append_rows(new_entry)
-            
-             # ✅ Shuffle Google Sheets Data
-            try:
-                data = sheet.get_all_values()  # Get all data
-                headers = data[0]  # Keep headers
-                rows = data[1:]  # Data rows (excluding headers)
-                random.shuffle(rows)  # Shuffle rows
+                new_entry = [[name, caffeine_level, sweetness, drink_type, roast_level, milk_type, flavor_notes, bitterness_level, weather] for _ in range(10)]
+                sheet.append_rows(new_entry)
+                
+                # ✅ Shuffle Google Sheets Data
+                try:
+                    data = sheet.get_all_values()  # Get all data
+                    headers = data[0]  # Keep headers
+                    rows = data[1:]  # Data rows (excluding headers)
+                    random.shuffle(rows)  # Shuffle rows
 
-                # ✅ Clear the sheet & write shuffled data
-                sheet.clear()
-                sheet.append_rows([headers] + rows, value_input_option='RAW')
+                    # ✅ Clear the sheet & write shuffled data
+                    sheet.clear()
+                    sheet.append_rows([headers] + rows, value_input_option='RAW')
 
-                st.success(f"✅ {name} added and Google Sheets shuffled!")
-            except Exception as e:
-                st.error(f"⚠️ Error shuffling Google Sheets: {e}")
+                    st.success(f"✅ {name} added and Google Sheets shuffled!")
+                except Exception as e:
+                    st.error(f"⚠️ Error shuffling Google Sheets: {e}")
 
-            st.success(f"✅ {name} added successfully!")
-            train_and_update_model()
-            st.rerun()
+                st.success(f"✅ {name} added successfully!")
+                train_and_update_model()
+                st.rerun()
 
+with col2:
 # 🎯 **Update Coffee**
-st.markdown("### ✏️ Update Coffee")
-coffee_names = df["Coffee Name"].dropna().unique()
-selected_coffee = st.selectbox("Select coffee to update:", coffee_names)
+    st.markdown("### ✏️ Update Coffee")
+    coffee_names = df["Coffee Name"].dropna().unique()
+    selected_coffee = st.selectbox("Select coffee to update:", coffee_names)
 
-if selected_coffee:
-    coffee_data = df[df["Coffee Name"] == selected_coffee].iloc[0]
+    if selected_coffee:
+        coffee_data = df[df["Coffee Name"] == selected_coffee].iloc[0]
 
-    # Pre-fill form with existing values
-    new_name = st.text_input("Coffee Name", value=coffee_data["Coffee Name"])
-    new_caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Caffeine Level"]))
-    new_sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Sweetness"]))
-    new_drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'], index=['Frozen', 'Iced', 'Hot'].index(coffee_data["Type"]))
-    new_roast_level = st.selectbox('Roast Level:', ['Medium', 'None', 'Dark'], index=['Medium', 'None', 'Dark'].index(coffee_data["Roast Level"]))
-    new_milk_type = 'Dairy' if coffee_data["Milk Type"] == "Dairy" else 'No Dairy'
-    new_flavor_notes = st.selectbox('Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'], index=['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'].index(coffee_data["Flavor Notes"]))
-    new_bitterness_level = st.selectbox('Bitterness Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Bitterness Level"]))
-    new_weather = st.selectbox('Weather:', ['Hot', 'Cold'], index=['Hot', 'Cold'].index(coffee_data["Weather"]))
+        # Pre-fill form with existing values
+        new_name = st.text_input("Coffee Name", value=coffee_data["Coffee Name"])
+        new_caffeine_level = st.selectbox('Caffeine Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Caffeine Level"]))
+        new_sweetness = st.selectbox('Sweetness:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Sweetness"]))
+        new_drink_type = st.selectbox('Drink Type:', ['Frozen', 'Iced', 'Hot'], index=['Frozen', 'Iced', 'Hot'].index(coffee_data["Type"]))
+        new_roast_level = st.selectbox('Roast Level:', ['Medium', 'None', 'Dark'], index=['Medium', 'None', 'Dark'].index(coffee_data["Roast Level"]))
+        new_milk_type = 'Dairy' if coffee_data["Milk Type"] == "Dairy" else 'No Dairy'
+        new_flavor_notes = st.selectbox('Flavor Notes:', ['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'], index=['Vanilla', 'Coffee', 'Chocolate', 'Nutty', 'Sweet', 'Bitter', 'Creamy', 'Earthy', 'Caramel', 'Espresso'].index(coffee_data["Flavor Notes"]))
+        new_bitterness_level = st.selectbox('Bitterness Level:', ['Low', 'Medium', 'High'], index=['Low', 'Medium', 'High'].index(coffee_data["Bitterness Level"]))
+        new_weather = st.selectbox('Weather:', ['Hot', 'Cold'], index=['Hot', 'Cold'].index(coffee_data["Weather"]))
 
-    image_file = st.file_uploader("Upload a new image for the coffee", type=['jpg', 'jpeg', 'png'])
+        image_file = st.file_uploader("Upload a new image for the coffee", type=['jpg', 'jpeg', 'png'])
 
-    if st.button("Update Coffee"):
-        try:
-            # ✅ Fetch the existing data in Google Sheets
-            existing_data = sheet.get_all_records()
+        if st.button("Update Coffee"):
+            try:
+                # ✅ Fetch the existing data in Google Sheets
+                existing_data = sheet.get_all_records()
 
-            for i, row in enumerate(existing_data, start=2):
-                if row["Coffee Name"] == selected_coffee:  # Find old coffee name
-                    updated_row = [new_name, new_caffeine_level, new_sweetness, new_drink_type, new_roast_level,
-                                   new_milk_type, new_flavor_notes, new_bitterness_level, new_weather]
-                    sheet.update(f'A{i}', [updated_row])  # ✅ Update Google Sheets row
+                for i, row in enumerate(existing_data, start=2):
+                    if row["Coffee Name"] == selected_coffee:  # Find old coffee name
+                        updated_row = [new_name, new_caffeine_level, new_sweetness, new_drink_type, new_roast_level,
+                                    new_milk_type, new_flavor_notes, new_bitterness_level, new_weather]
+                        sheet.update(f'A{i}', [updated_row])  # ✅ Update Google Sheets row
 
-            # ✅ Handle Image Upload
-            if image_file:
-                image_path = f"{new_name}.png"
-                with open(image_path, "wb") as f:
-                    f.write(image_file.getbuffer())
+                # ✅ Handle Image Upload
+                if image_file:
+                    image_path = f"{new_name}.png"
+                    with open(image_path, "wb") as f:
+                        f.write(image_file.getbuffer())
 
-                image_link = upload_image_to_drive(image_path, new_name)
-                st.success("📸 Image updated successfully!")
+                    image_link = upload_image_to_drive(image_path, new_name)
+                    st.success("📸 Image updated successfully!")
 
-            train_and_update_model()
-            st.success(f"✅ {new_name} updated successfully.")
-            st.rerun()
+                train_and_update_model()
+                st.success(f"✅ {new_name} updated successfully.")
+                st.rerun()
 
-        except Exception as e:
-            st.error(f"⚠️ Error updating Google Sheets: {e}")
+            except Exception as e:
+                st.error(f"⚠️ Error updating Google Sheets: {e}")
 
-# 🎯 **Delete Coffee**
-st.markdown("### 🗑️ Delete Coffee")
+with col3:
+    # 🎯 **Delete Coffee**
+    st.markdown("### 🗑️ Delete Coffee")
 
-delete_coffee = st.selectbox("Select coffee to delete:", df["Coffee Name"].dropna().unique())
+    delete_coffee = st.selectbox("Select coffee to delete:", df["Coffee Name"].dropna().unique())
 
-if st.button("Delete Coffee"):
-    # ✅ Fetch data from Google Sheets
-    existing_data = sheet.get_all_records()
+    if st.button("Delete Coffee"):
+        # ✅ Fetch data from Google Sheets
+        existing_data = sheet.get_all_records()
 
-    # ✅ Find all rows matching the selected coffee
-    rows_to_delete = [i + 2 for i, row in enumerate(existing_data) if row["Coffee Name"] == delete_coffee]
+        # ✅ Find all rows matching the selected coffee
+        rows_to_delete = [i + 2 for i, row in enumerate(existing_data) if row["Coffee Name"] == delete_coffee]
 
-    if rows_to_delete:
-        try:
-            # ✅ Delete from bottom to top to prevent row shifting issues
-            rows_to_delete.sort(reverse=True)
-            for row in rows_to_delete:
-                sheet.delete_rows(row)
+        if rows_to_delete:
+            try:
+                # ✅ Delete from bottom to top to prevent row shifting issues
+                rows_to_delete.sort(reverse=True)
+                for row in rows_to_delete:
+                    sheet.delete_rows(row)
 
-            st.success(f"🗑 {delete_coffee} deleted successfully from Google Sheets!")
+                st.success(f"🗑 {delete_coffee} deleted successfully from Google Sheets!")
 
-            # ✅ Try to remove the image from Google Drive
-            image_link = get_image_url_from_drive(delete_coffee)
+                # ✅ Try to remove the image from Google Drive
+                image_link = get_image_url_from_drive(delete_coffee)
 
-            if image_link:
-                # ✅ Correctly extract the file ID
-                image_id = image_link.split("id=")[-1].split("&")[0]  # Only take the ID before "&"
+                if image_link:
+                    # ✅ Correctly extract the file ID
+                    image_id = image_link.split("id=")[-1].split("&")[0]  # Only take the ID before "&"
 
-                # ✅ Delete the file using the correct ID
-                drive_service.files().delete(fileId=image_id).execute()
-                st.success(f"🗑 Image for {delete_coffee} deleted successfully from Google Drive!")
+                    # ✅ Delete the file using the correct ID
+                    drive_service.files().delete(fileId=image_id).execute()
+                    st.success(f"🗑 Image for {delete_coffee} deleted successfully from Google Drive!")
 
-            # ✅ Retrain model after deletion
-            train_and_update_model()
-            st.rerun()
+                # ✅ Retrain model after deletion
+                train_and_update_model()
+                st.rerun()
 
-        except Exception as e:
-            st.error(f"⚠️ Error deleting coffee: {e}")
+            except Exception as e:
+                st.error(f"⚠️ Error deleting coffee: {e}")
 
-    else:
-        st.error("❌ Coffee not found in Google Sheets.")
+        else:
+            st.error("❌ Coffee not found in Google Sheets.")
 
 st.divider()
 
