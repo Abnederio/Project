@@ -51,58 +51,39 @@ if "page_selection" not in st.session_state:
 def set_page_selection(page):
     st.session_state.page_selection = page
 
-# ✅ Custom CSS for Perfect Coffee Shop Theme
+#CSS 
 st.markdown(
     """
     <style>
         /* Background */
-        body {
-            background-color: #F5E8C7 !important;  /* Creamy Latte */
-        }
-        .stApp {
-            background-color: #F5E8C7 !important;  /* Soft welcoming tone */
+        body, .stApp {
+            background-color: #A27B5C;  /* Warm Coffee Tone */
         }
 
-        /* Sidebar Styling */
-        section[data-testid="stSidebar"] {
-            background-color: #754F44 !important;  /* Espresso Brown */
-        }
-
-        /* General Button Styling */
+        /* Submit Button */
         div.stButton > button {
-            width: 100%;
+            background-color: #3E2723;  /* Espresso Brown */
+            color: #FFFFFF;  /* White Text */
             font-size: 16px;
-            padding: 12px;
-            border-radius: 8px;
-            transition: 0.3s ease-in-out;
-            border: none;
             font-weight: bold;
-        }
-        
-        /* Caramel Button (Go Back) */
-        div.stButton > button:first-child {
-            background-color: #A67B5B;  /* Warm Caramel */
-            color: white;
-        }
-        div.stButton > button:first-child:hover {
-            background-color: #8D6C4F;  /* Toasted Brown */
-            transform: scale(1.05);  
+            border-radius: 8px;
+            padding: 10px 20px;
+            border: 2px solid #5D4037;  /* Subtle Border */
+            transition: all 0.3s ease-in-out;
         }
 
-        /* Mocha Button (Logout) */
-        div.stButton > button:last-child {
-            background-color: #FFFFF;  /* Dark Mocha */
-            color: white;
+        /* Hover Effect */
+        div.stButton > button:hover {
+            background-color: #4E342E;  /* Richer Coffee */
+            transform: scale(1.08);
+            border-color: #3E2723;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
         }
-        div.stButton > button:last-child:hover {
-            background-color: #4A4032;  /* Richer Mocha */
-            transform: scale(1.05);
-        }
-        
-        /* Sidebar Buttons */
-        .st-emotion-cache-ocqkz7:hover { 
-            background-color: #faebd7 !important;  /* Darker Espresso */
-            color: white !important;
+
+        /* Click Effect */
+        div.stButton > button:active {
+            transform: scale(0.95);
+            background-color: #2E1B14;  /* Strong Espresso */
         }
 
         /* Headers & Text */
@@ -113,12 +94,13 @@ st.markdown(
             color: #4E342E !important;  /* Dark Cocoa Text */
         }
 
-        /* Dataset Table */
-        .stDataFrame {
+        /* Tables (DataFrame Styling) */
+        .dataframe {
             background-color: #F0D9B5 !important;  /* Light Cappuccino */
-            color: #3E2723 !important;  /* Mocha text */
+            color: #3E2723 !important;  /* Mocha Text */
+            border-radius: 10px;
+            padding: 10px;
         }
-
     </style>
     """,
     unsafe_allow_html=True
