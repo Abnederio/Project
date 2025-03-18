@@ -16,6 +16,21 @@ st.set_page_config(initial_sidebar_state="collapsed", page_title="Coffee Recomme
 
 if 'token' not in st.session_state or st.session_state.token is None:
     st.switch_page("pages/admin.py") 
+    
+st.markdown(
+    """
+    <style>
+        /* Background */
+        body {
+            background-color: #F5E8C7 !important;  /* Creamy Latte */
+        }
+        .stApp {
+            background-color: #F5E8C7 !important;  /* Soft welcoming tone */
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # ✅ Load Google API Credentials Securely
 if "GOOGLE_CREDENTIALS" not in st.secrets:
