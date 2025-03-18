@@ -212,7 +212,7 @@ col1, col2 = st.columns(2)
 with col1:
     if st.button("🏠 Go Back to Menu"):
         st.session_state.page_selection = "about"
-        st.switch_page("pages/home.py")
+        st.switch_page("pages/menu.py")
 
 with col2:
     if st.button("🚪 Logout"):
