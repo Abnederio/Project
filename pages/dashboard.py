@@ -91,7 +91,7 @@ st.markdown(
 
         /* Mocha Button (Logout) */
         div.stButton > button:last-child {
-            background-color: #5E503F;  /* Dark Mocha */
+            background-color: #FFFFF;  /* Dark Mocha */
             color: white;
         }
         div.stButton > button:last-child:hover {
@@ -101,7 +101,7 @@ st.markdown(
         
         /* Sidebar Buttons */
         .st-emotion-cache-ocqkz7:hover { 
-            background-color: #6B4E3D !important;  /* Darker Espresso */
+            background-color: #faebd7 !important;  /* Darker Espresso */
             color: white !important;
         }
 
