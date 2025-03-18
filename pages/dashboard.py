@@ -89,11 +89,6 @@ st.markdown(
             background-color: #2E1B14;  /* Strong Espresso */
         }
 
-        /* Headers & Text */
-        h1, h2, h3, h4, h5, h6 {
-            color: #3E2723 !important;  /* Roasted Coffee */
-        }
-
         /* Dataset Table */
         .stDataFrame {
             background-color: #F0D9B5 !important;  /* Light Cappuccino */
