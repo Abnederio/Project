@@ -93,9 +93,6 @@ st.markdown(
         h1, h2, h3, h4, h5, h6 {
             color: #3E2723 !important;  /* Roasted Coffee */
         }
-        p, div {
-            color: #4E342E !important;  /* Dark Cocoa Text */
-        }
 
         /* Dataset Table */
         .stDataFrame {
